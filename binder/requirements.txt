@@ -1,0 +1,13 @@
+plotly
+networkx
+pandas
+ipywidgets
+ipykernel
+requests
+pandas
+numpy
+jupyter-client
+nbformat
+anywidget
+requests 
+country-converter
