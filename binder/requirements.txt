@@ -11,5 +11,3 @@ nbformat
 anywidget
 requests 
 country-converter
-IPython.display
-typing
