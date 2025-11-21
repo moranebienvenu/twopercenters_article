@@ -86,6 +86,7 @@ project:
     - content/figure_2.ipynb
     - content/figure_3.ipynb
     - content/figure_4.ipynb
+    - content/Dash_client.py 
 site:
   template: article-theme # Or book-theme
   url: https://moranebienvenu.github.io/twopercenters_article
