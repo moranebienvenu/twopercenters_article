@@ -19,8 +19,9 @@ from typing import Dict, List, Optional, Any, Tuple
 from IPython.display import display, clear_output,  HTML
 import ipywidgets as widgets
 import dash_daq as daq
+import plotly.io as pio
 
-
+pio.renderers.default = "plotly_mimetype"
 class TwoPercentersClient:
     """Client pour interroger l'API Twopercenters et créer des visualisations."""
     
@@ -51,38 +52,108 @@ class TwoPercentersClient:
     # MÉTHODES UTILITAIRES
     # ========================================================================
     
-    def _get_metric_long_name(self, career: bool, metric: str) -> str:
-        """Obtient le nom complet d'une métrique."""
-        metric_names = {
-            'rank (ns)': 'Rank (no self-citations)',
-            'nc (ns)': 'Total citations (no self-cit.)',
-            'h (ns)': 'H-index (no self-cit.)',
-            'hm (ns)': 'Hm-index (no self-cit.)',
-            'nps (ns)': '# single authored papers (no self-cit.)',
-            'ncs (ns)': 'Cit. to single authored papers (no self-cit.)',
-            'cpsf (ns)': '# single + first authored papers (no self-cit.)',
-            'ncsf (ns)': 'Cit. to single + first authored (no self-cit.)',
-            'npsfl (ns)': '# single + first + last authored (no self-cit.)',
-            'ncsfl (ns)': 'Cit. to single + first + last (no self-cit.)',
-            'c (ns)': 'Composite score (no self-cit.)',
-            'npciting (ns)': '# distinct citing papers (no self-cit.)',
-            'rank': 'Rank',
-            'nc': 'Total citations',
-            'h': 'H-index',
-            'hm': 'Hm-index',
-            'nps': '# single authored papers',
-            'ncs': 'Citations to single authored papers',
-            'cpsf': '# single + first authored papers',
-            'ncsf': 'Citations to single + first authored',
-            'npsfl': '# single + first + last authored',
-            'ncsfl': 'Citations to single + first + last',
-            'c': 'Composite score',
-            'npciting': '# distinct citing papers',
-            'np': '# papers',
-            'self%': 'Self-citation %'
-        }
-        return metric_names.get(metric, metric)
+    def _get_metric_long_name(self, career: bool, metric: str, yr: int, include_year: bool ) -> str:
+        yrs = [2017, 2018, 2019, 2020, 2021]
+        if yr == 0: year = 2017
+        if yr != 0 and career == False: yr = yr + 1
+        year = yrs[yr]
+        if include_year == True: metric_name_dict = {
+            'authfull':'author name',
+            'inst_name':'institution name (large institutions only)',
+            'cntry':'country associated with most recent institution',
+            'np':f'number of papers',
+            'firstyr':'year of first publication',
+            'lastyr':'year of most recent publication',
+            'rank (ns)':'rank based on composite score c', 
+            'nc (ns)':f'total cites ', 
+            'h (ns)':f'h-index', 
+            'hm (ns)':f'hm-index',
+            'nps (ns)':'number of single authored papers',
+            'ncs (ns)':'total cites to single authored papers', 
+            'cpsf (ns)':'number of single + first authored papers', 
+            'ncsf (ns)':'total cites to single + first authored papers', 
+            'npsfl (ns)':'number of single + first + last authored papers', 
+            'ncsfl (ns)':'total cites to single + first + last authored papers',
+            'c (ns)':'composite score', 
+            'npciting (ns)':'number of distinct citing papers', 
+            'cprat (ns)':'ratio of total citations to distinct citing papers', 
+            'np cited (ns)':f'number of papers 1960-{year} that have been cited at least once (1996-{year})',
+            'self%':'self-citation percentage', 
+            'rank':'rank based on composite score c', 
+            'nc':f'total cites', 
+            'h':f'h-index',
+            'hm':f'hm-index', 
+            'nps':'number of single authored papers',
+            'ncs':'total cites to single authored papers', 
+            'cpsf':'number of single + first authored papers', 
+            'ncsf':'total cites to single + first authored papers', 
+            'npsfl':'number of single + first + last authored papers', 
+            'ncsfl':'total cites to single + first + last authored papers',
+            'c':'composite score', 
+            'npciting':'number of distinct citing papers', 
+            'cprat':'ratio of total citations to distinct citing papers', 
+            'np cited':f'number of papers 1960-{year} that have been cited at least once (1996-{year})',
+            'np_d':f'# papers 1960-{year} in titles that are discontinued in Scopus', 
+            'nc_d':f'total cites 1996-{year} from titles that are discontinued in Scopus', 
+            'sm-subfield-1':'top ranked Science-Metrix category (subfield) for author', 
+            'sm-subfield-1-frac':'associated category fraction',
+            'sm-subfield-2':'second ranked Science-Metrix category (subfield) for author', 
+            'sm-subfield-2-frac':'associated category fraction', 
+            'sm-field':'top ranked higher-level Science-Metrix category (field) for author', 
+            'sm-field-frac':'associated category fraction',
+            'rank sm-subfield-1':'rank of c within category sm-subfield-1', 
+            'rank sm-subfield-1 (ns)':'rank of c (ns) within category sm-subfield-1', 
+            'sm-subfield-1 count':'total number of authors within category sm-subfield-1'}
+        else: metric_name_dict = {
+            'authfull':'author name',
+            'inst_name':'institution name (large institutions only)',
+            'cntry':'country associated with most recent institution',
+            'np':f'number of papers',
+            'firstyr':'year of first publication',
+            'lastyr':'year of most recent publication',
+            'rank (ns)':'rank based on composite score c', 
+            'nc (ns)':f'total cites', 
+            'h (ns)':f'h-index', 
+            'hm (ns)':f'hm-index',
+            'nps (ns)':'number of single authored papers',
+            'ncs (ns)':'total cites to single authored papers', 
+            'cpsf (ns)':'number of single + first authored papers', 
+            'ncsf (ns)':'total cites to single + first authored papers', 
+            'npsfl (ns)':'number of single + first + last authored papers', 
+            'ncsfl (ns)':'total cites to single + first + last authored papers',
+            'c (ns)':'composite score', 
+            'npciting (ns)':'number of distinct citing papers', 
+            'cprat (ns)':'ratio of total citations to distinct citing papers', 
+            'np cited (ns)':f'number of papers published since 1960 that have been cited at least', # since 1996 for career wide!
+            'self%':'self-citation percentage', 
+            'rank':'rank based on composite score c', 
+            'nc':f'total cites', 
+            'h':f'h-index',
+            'hm':f'hm-index', 
+            'nps':'number of single authored papers',
+            'ncs':'total cites to single authored papers', 
+            'cpsf':'number of single + first authored papers', 
+            'ncsf':'total cites to single + first authored papers', 
+            'npsfl':'number of single + first + last authored papers', 
+            'ncsfl':'total cites to single + first + last authored papers',
+            'c':'composite score', 
+            'npciting':'number of distinct citing papers', 
+            'cprat':'ratio of total citations to distinct citing papers', 
+            'np cited':f'number of papers published since 1960 that have been cited at least', # since 1996 for career wide!
+            'np_d':f'# papers since 1960 in titles that are discontinued in Scopus', 
+            'nc_d':f'total cites since 1996 from titles that are discontinued in Scopus', 
+            'sm-subfield-1':'top ranked Science-Metrix category (subfield) for author', 
+            'sm-subfield-1-frac':'associated category fraction',
+            'sm-subfield-2':'second ranked Science-Metrix category (subfield) for author', 
+            'sm-subfield-2-frac':'associated category fraction', 
+            'sm-field':'top ranked higher-level Science-Metrix category (field) for author', 
+            'sm-field-frac':'associated category fraction',
+            'rank sm-subfield-1':'rank of c within category sm-subfield-1', 
+            'rank sm-subfield-1 (ns)':'rank of c (ns) within category sm-subfield-1', 
+            'sm-subfield-1 count':'total number of authors within category sm-subfield-1'}
+        return metric_name_dict.get(metric, metric)
     
+
     #utils coming from twopercenters dashboard 
     def get_aggregate_data(self, group, group_name, prefix):
         """
@@ -273,187 +344,130 @@ class TwoPercentersClient:
     # VISUALISATIONS - AUTEUR INDIVIDUEL
     # ========================================================================
     
-    def plot_author_metrics_gauge(self, author_name: str, year: str = "2021",
-                                  career: bool = True, exclude_self_citations: bool = False,
-                                  comparison_group: str = "country") -> go.Figure:
-        """
-        Crée des jauges comparant les métriques d'un auteur aux médianes/max du groupe.
-        Reproduit la visualisation du dashboard (author_find.py).
+    #metrics for one author by career and year
+    def author_vs_career_plot(self, author_name: str, exclude_self_citations: bool = False, 
+                          width: int = 1400, height: int = 2000):
+        """Crée le graphique de comparaison Career vs Single Year."""
         
-        Args:
-            author_name: Nom de l'auteur
-            year: Année à afficher
-            career: True pour career, False pour single year
-            exclude_self_citations: Exclure les auto-citations
-            comparison_group: "country", "field", ou "institution"
-            
-        Returns:
-            Figure Plotly avec gauges
-        """
-        index = "career" if career else "singleyr"
-        prefix = "career" if career else "singleyr"
+        # Récupérer les données en utilisant self.get_author_data()
+        data_career = self.get_author_data(author_name, index='career')
+        data_singleyear = self.get_author_data(author_name, index='singleyr')
         
-        # Récupérer les données de l'auteur
-        data = self.get_author_data(author_name, index=index)
+        if not data_career and not data_singleyear:
+            print(f"❌ No data for {author_name}")
+            return None
         
-        if not data:
-            print(f"Aucune donnée trouvée pour {author_name}")
-            return go.Figure()
+        # Extraire les années - CAREER
+        years_career = []
+        metrics_data_career = []
+        if data_career:
+            for key in sorted(data_career.keys()):
+                if not key.endswith('_log'):
+                    parts = key.split('_')
+                    if len(parts) == 2 and parts[0] == 'career':
+                        years_career.append(parts[1])
+                        metrics_data_career.append(data_career[key])
         
-        key = f"{prefix}_{year}"
-        if key not in data:
-            print(f"Données non disponibles pour l'année {year}")
-            return go.Figure()
+        # Extraire les années - SINGLE YEAR
+        years_singleyear = []
+        metrics_data_singleyear = []
+        if data_singleyear:
+            for key in sorted(data_singleyear.keys()):
+                if not key.endswith('_log'):
+                    parts = key.split('_')
+                    if len(parts) == 2 and parts[0] == 'singleyr':
+                        years_singleyear.append(parts[1])
+                        metrics_data_singleyear.append(data_singleyear[key])
         
-        author_data = data[key]
+        # Créer DataFrames
+        df_career = pd.DataFrame(metrics_data_career) if metrics_data_career else pd.DataFrame()
+        df_singleyear = pd.DataFrame(metrics_data_singleyear) if metrics_data_singleyear else pd.DataFrame()
         
-        # Récupérer les données agrégées pour comparaison
-        info = self.get_author_info(author_name, index=index)
+        if not df_career.empty:
+            df_career['Year'] = years_career
+            df_career['self%'] = df_career['self%'] * 100
         
-        # Préparer les métriques
-        suffix = ' (ns)' if exclude_self_citations else ''
-        metrics_list = [f'nc{suffix}', f'h{suffix}', f'hm{suffix}', 
-                       f'ncs{suffix}', f'ncsf{suffix}', f'ncsfl{suffix}']
+        if not df_singleyear.empty:
+            df_singleyear['Year'] = years_singleyear
+            df_singleyear['self%'] = df_singleyear['self%'] * 100
         
-        metric_titles = ['Total Citations', 'H-index', 'Hm-index',
-                        'Cit. Single Auth.', 'Cit. Single+First', 'Cit. Single+First+Last']
-        
-        # Créer la figure avec sous-graphiques
-        fig = make_subplots(
-            rows=2, cols=3,
-            specs=[[{'type': 'indicator'}] * 3,
-                   [{'type': 'indicator'}] * 3],
-            subplot_titles=metric_titles,
-            vertical_spacing=0.15,
-            horizontal_spacing=0.1
-        )
-        
-        # Valeurs de l'auteur
-        author_values = [author_data.get(m, 0) for m in metrics_list]
-        
-        # Dans la vraie implémentation, ces valeurs viendraient de get_es_aggregate
-        for i, (metric, title, value) in enumerate(zip(metrics_list, metric_titles, author_values)):
-            row = (i // 3) + 1
-            col = (i % 3) + 1
-            
-            # Estimer médiane et max (à remplacer par vraies valeurs API)
-            median = value * 0.7 if value > 0 else 100
-            max_val = value * 1.5 if value > 0 else 1000
-            
-            
-            fig.add_trace(
-                go.Indicator(
-                    mode="gauge+number+delta",
-                    value=value,
-                    delta={'reference': median, 
-                          'increasing': {'color': "limegreen"},
-                          'decreasing': {'color': "indianred"}},
-                    gauge={
-                        'axis': {'range': [None, max_val], 'tickcolor': "#aaa"},
-                        'bar': {'color': 'lightseagreen'},
-                        'threshold': {
-                            'line': {'color': "red", 'width': 4},
-                            'thickness': 0.75,
-                            'value': median
-                        }
-                    },
-                    title={'text': title, 'font': {'color': '#aaa', 'size': 12}}
-                ),
-                row=row, col=col
-            )
-        
-        # Mise en forme
-        fig.update_layout(
-            height=500,
-            plot_bgcolor=self.bgc,
-            paper_bgcolor=self.bgc,
-            font=dict(color='lightseagreen', size=10),
-            title={
-                'text': f"{author_name} - Métriques {year}",
-                'font': {'size': 16, 'color': self.lightAccent1},
-                'x': 0.5
-            },
-            margin={'l': 20, 'r': 20, 't': 80, 'b': 20}
-        )
-        
-        return fig
-    
-    def plot_author_career(self, author_name: str, exclude_self_citations: bool = False,
-                          width: int = 1200, height: int = 2000) -> go.Figure:
-        """Crée un graphique montrant l'évolution des métriques d'un auteur sur sa carrière."""
-        data = self.get_author_data(author_name, index="career")
-        
-        if not data:
-            print(f"Aucune donnée trouvée pour {author_name}")
-            return go.Figure()
-        
-        # Extraire les années et les données
-        years = []
-        metrics_data = []
-        
-        for key in sorted(data.keys()):
-            if key.endswith('_log'):
-                continue
-            parts = key.split('_')
-            if len(parts) == 2 and parts[0] == 'career':
-                years.append(parts[1])
-                metrics_data.append(data[key])
-        
-        if not years:
-            print(f"Aucune donnée temporelle trouvée pour {author_name}")
-            return go.Figure()
-        
-        # Créer le DataFrame
-        df = pd.DataFrame(metrics_data)
-        df['Year'] = years
-        df['self%'] = df['self%'] * 100
-        
-        # Définir les métriques à afficher
+        # Définir les métriques
         suffix = ' (ns)' if exclude_self_citations else ''
         metrics_list = [
             f'rank{suffix}', f'c{suffix}', f'nc{suffix}', f'h{suffix}', 
             f'hm{suffix}', f'ncs{suffix}', f'ncsf{suffix}', f'ncsfl{suffix}',
-            f'nps{suffix}', f'cpsf{suffix}', f'npsfl{suffix}', f'npciting{suffix}',
             'np', 'self%'
         ]
         
-        # Filtrer les métriques disponibles
-        available_metrics = [m for m in metrics_list if m in df.columns]
+        # Filtrer métriques disponibles
+        available_metrics = [m for m in metrics_list 
+                            if (not df_career.empty and m in df_career.columns) or 
+                            (not df_singleyear.empty and m in df_singleyear.columns)]
         
-        # Créer les sous-titres
-        subplot_titles = [self._get_metric_long_name(True, m) 
-                         for m in available_metrics]
+        if not available_metrics:
+            print("❌ no metrics available")
+            return None
         
-        # Créer la figure
+        # Créer les sous-titres en utilisant votre fonction _get_metric_long_name
+        subplot_titles = []
+        for metric in available_metrics:
+            # Pour Career (colonne 1) - career=True, include_year=True
+            career_title = self._get_metric_long_name(career=True, metric=metric, yr=0, include_year=True)
+            # Pour Single Year (colonne 2) - career=False, include_year=False  
+            singleyear_title = self._get_metric_long_name(career=False, metric=metric, yr=0, include_year=False)
+            
+            subplot_titles.extend([career_title, singleyear_title])
+        
+        # Créer figure avec subplots
         fig = make_subplots(
             rows=len(available_metrics), 
-            cols=1, 
+            cols=2,
             subplot_titles=subplot_titles,
-            vertical_spacing=0.02
+            vertical_spacing=0.05,
+            horizontal_spacing=0.08,
+            #column_titles=[f"<b>Career: {author_name}</b>", f"<b>Single Year: {author_name}</b>"]
         )
         
-        # Palette de couleurs
-        col_list = px.colors.sample_colorscale("turbo", 
-                                              [n/(100-1) for n in range(100)])
+        # Couleurs
+        col_turbo = px.colors.sample_colorscale("turbo", [n/99 for n in range(100)])
+        col_viridis = px.colors.sample_colorscale("viridis", [n/99 for n in range(100)])
         
         # Ajouter les traces
         for i, metric in enumerate(available_metrics):
-            fig.add_trace(
-                go.Scatter(
-                    x=df['Year'], 
-                    y=df[metric],
-                    marker=dict(color=col_list[len(col_list) - i - 25]),
-                    name=metric,
-                    hovertemplate='Année: %{x}<br>Valeur: %{y}<extra></extra>'
-                ), 
-                row=i + 1, 
-                col=1
-            )
+            row = i + 1
+            
+            # Career (colonne 1)
+            if not df_career.empty and metric in df_career.columns:
+                fig.add_trace(
+                    go.Scatter(
+                        x=df_career['Year'], y=df_career[metric],
+                        mode='lines+markers',
+                        marker=dict(color=col_turbo[99-i-25], size=8),
+                        line=dict(color=col_turbo[99-i-25], width=2),
+                        name=f"Career_{metric}",
+                        hovertemplate='Year: %{x}<br>Value: %{y}<extra></extra>',
+                        showlegend=False
+                    ), 
+                    row=row, col=1
+                )
+            
+            # Single Year (colonne 2)
+            if not df_singleyear.empty and metric in df_singleyear.columns:
+                fig.add_trace(
+                    go.Scatter(
+                        x=df_singleyear['Year'], y=df_singleyear[metric],
+                        mode='lines+markers',
+                        marker=dict(color=col_turbo[99-i-25], size=8),
+                        line=dict(color=col_turbo[99-i-25], width=2),
+                        name=f"SingleYear_{metric}",
+                        hovertemplate='Year: %{x}<br>Value: %{y}<extra></extra>',
+                        showlegend=False
+                    ), 
+                    row=row, col=2
+                )
         
-        # Mise en forme
+        # Style
         fig.update_xaxes(
-            tickvals=years, 
-            ticktext=years, 
             gridcolor=self.darkAccent2, 
             linecolor=self.darkAccent2, 
             zeroline=False
@@ -463,22 +477,78 @@ class TwoPercentersClient:
             linecolor=self.darkAccent2, 
             zeroline=False
         )
+        annotations = list(fig.layout.annotations)  # <-- garder les sous-titres existants
+
+        # Ajouter tes deux annotations
+        annotations += [
+            dict(text=f"<b>Career-long data: {author_name}</b>", x=0.10, y=1.05,
+                xref="paper", yref="paper", showarrow=False, font=dict(size=16)),
+            dict(text=f"<b>Single-year data: {author_name}</b>", x=0.90, y=1.05,
+                xref="paper", yref="paper", showarrow=False, font=dict(size=16))
+        ]
+
         fig.update_layout(
             plot_bgcolor=self.bgc, 
             paper_bgcolor=self.bgc, 
             font=dict(color=self.lightAccent1),
-            height=height,
-            width=width,
+            height=height, 
+            width=width, 
             showlegend=False,
-            title={
-                'text': f"Données carrière: {author_name}", 
-                'font': {'size': 20}
-            }, 
-            title_x=0.5
+            annotations=annotations
         )
         
         return fig
     
+    def interactive_author_vs_career_plot(self, author_name: str = 'Ioannidis, John P.A.'):
+        """Crée l'interface interactive avec widgets."""
+        
+        author_search = widgets.Combobox(
+            value=author_name, 
+            placeholder='Name...', 
+            options=[],
+            description='Author:', 
+            ensure_option=False,
+            style={'description_width': '100px'},
+            layout=widgets.Layout(width='500px')
+        )
+        
+        search_status = widgets.HTML(value='')
+        exclude_self = widgets.Checkbox(value=False, description='Exclude self-citation')
+        update_button = widgets.Button(description='Generate Plot', button_style='success')
+        output = widgets.Output()
+        
+        def update_suggestions(change):
+            query = change['new']
+            if len(query) >= 3:
+                # Utiliser self.search_authors()
+                results = self.search_authors(query, limit=20)
+                author_search.options = [r.get('authfull', '') for r in results]
+                search_status.value = f'✓ {len(results)} résultats'
+            else:
+                author_search.options = []
+        
+        author_search.observe(update_suggestions, names='value')
+        
+        def update_plot(b=None):
+            with output:
+                clear_output(wait=True)
+                # print(f"🔄 Génération pour {author_search.value}...")
+                # Utiliser self.create_comparison_plot()
+                fig = self.author_vs_career_plot(author_search.value, exclude_self.value)
+                if fig:
+                    fig.show()
+        
+        update_button.on_click(update_plot)
+        
+        controls = widgets.VBox([
+            widgets.HBox([author_search, search_status, exclude_self]),
+            update_button
+        ])
+        
+        display(controls, output)
+        update_plot()
+
+    #author v author comparison
     def plot_author_comparison(self, author1: str, author2: str, 
                               year: str = "2021", career: bool = True,
                               exclude_self_citations: bool = False,
@@ -579,6 +649,7 @@ class TwoPercentersClient:
     # INTERFACES INTERACTIVES AVEC WIDGETS
     # ========================================================================
  
+    #Gauges auteur individuel career or single year
     def get_real_limits_via_api(self, author_data: Dict, comp_group: str, 
                                 prefix: str, year: str, suffix: str) -> Tuple[Optional[Dict], Optional[Dict]]:
         """
@@ -1070,7 +1141,7 @@ class TwoPercentersClient:
                     #             border: 1px solid {self.darkAccent3};
                     #             color: lightseagreen;">
                     #     <div style="font-size: 16px; margin-bottom: 10px; font-weight: bold;">
-                    #         📐 Composite Score Formula
+                    #          Composite Score Formula
                     #     </div>
                     #     <div style="font-size: 18px; font-family: 'Courier New', monospace;">
                     #         c = (6×nc + 6×h + 5×h<sub>m</sub> + 4×nc<sub>s</sub> + 3×nc<sub>sf</sub> + 2×nc<sub>sfl</sub>) / 26
@@ -1081,8 +1152,6 @@ class TwoPercentersClient:
                     # </div>
                     # """
                     # display(HTML(formula_html))
-                    
-                    # print("✅ Visualisation complète!")
                     
                 except Exception as e:
                     print(f"❌ Erreur: {str(e)}")
@@ -1105,170 +1174,821 @@ class TwoPercentersClient:
         # Chargement initial
         update_plot(None)
         
-    def interactive_author_comparison(self):
-        """
-        Interface interactive pour comparer deux auteurs.
-        Reproduit l'interface de author_vs_author_layout.
-        """
-        # Widgets de contrôle
-        # author1_search = widgets.Text(
-        #     value='Ioannidis, John P.A.',
-        #     placeholder='Nom, Prénom',
-        #     description='Auteur 1:',
-        #     style={'description_width': '80px'},
-        #     layout=widgets.Layout(width='350px')
-        # )
+    #author_vs_author_layout
+    # def interactive_author_comparison(self):
+    #     """
+    #     Interface interactive pour comparer deux auteurs.
+    #     Reproduit l'interface de author_vs_author_layout.
+    #     """
+    #     # Widgets de contrôle
+    #     # author1_search = widgets.Text(
+    #     #     value='Ioannidis, John P.A.',
+    #     #     placeholder='Nom, Prénom',
+    #     #     description='Auteur 1:',
+    #     #     style={'description_width': '80px'},
+    #     #     layout=widgets.Layout(width='350px')
+    #     # )
         
-        # author2_search = widgets.Text(
-        #     value='Bengio, Yoshua',
-        #     placeholder='Nom, Prénom',
-        #     description='Auteur 2:',
-        #     style={'description_width': '80px'},
-        #     layout=widgets.Layout(width='350px')
-        # )
+    #     # author2_search = widgets.Text(
+    #     #     value='Bengio, Yoshua',
+    #     #     placeholder='Nom, Prénom',
+    #     #     description='Auteur 2:',
+    #     #     style={'description_width': '80px'},
+    #     #     layout=widgets.Layout(width='350px')
+    #     # )
 
+    #     author1_search = widgets.Combobox(
+    #         value='Ioannidis, John P.A.',
+    #         placeholder='Commencez à taper...',
+    #         options=[],
+    #         description='Auteur 1:',
+    #         ensure_option=False,
+    #         style={'description_width': '80px'},
+    #         layout=widgets.Layout(width='400px')
+    #     )
+    #     search_status1 = widgets.HTML(value='')
+
+    #     def update_suggestions1(change):
+    #         query = change['new']
+    #         if len(query) >= 3:
+    #             search_status1.value = '<i>🔍</i>'
+    #             try:
+    #                 results = self.search_authors(query, limit=20)
+    #                 suggestions = [r.get('authfull', '') for r in results if r.get('authfull')]
+    #                 author1_search.options = suggestions
+    #                 search_status1.value = f'<i>✓ {len(suggestions)}</i>'
+    #             except Exception as e:
+    #                 search_status1.value = f'<i style="color:red">❌</i>'
+    #         else:
+    #             author1_search.options = []
+    #             search_status1.value = ''
+
+    #     author1_search.observe(update_suggestions1, names='value')
+
+    #     author2_search = widgets.Combobox(
+    #         value='Bengio, Yoshua',
+    #         placeholder='Commencez à taper...',
+    #         options=[],
+    #         description='Auteur 2:',
+    #         ensure_option=False,
+    #         style={'description_width': '80px'},
+    #         layout=widgets.Layout(width='400px')
+    #     )
+         
+    #     search_status2 = widgets.HTML(value='')
+
+    #     def update_suggestions2(change):
+    #         query = change['new']
+    #         if len(query) >= 3:
+    #             search_status2.value = '<i>🔍</i>'
+    #             try:
+    #                 results = self.search_authors(query, limit=15)
+    #                 suggestions = [r.get('authfull', '') for r in results if r.get('authfull')]
+    #                 author2_search.options = suggestions
+    #                 search_status2.value = f'<i>✓ {len(suggestions)}</i>'
+    #             except Exception as e:
+    #                 search_status2.value = f'<i style="color:red">❌</i>'
+    #         else:
+    #             author2_search.options = []
+    #             search_status2.value = ''
+        
+    #     author2_search.observe(update_suggestions2, names='value')
+        
+    #     dataset_type = widgets.RadioButtons(
+    #         options=['Career', 'Single Year'],
+    #         value='Career',
+    #         description='Type:',
+    #         style={'description_width': '80px'}
+    #     )
+        
+    #     year_selector = widgets.Dropdown(
+    #         options=['2017', '2019', '2020', '2021'],
+    #         value='2021',
+    #         description='Année:',
+    #         style={'description_width': '80px'}
+    #     )
+        
+    #     exclude_self = widgets.Checkbox(
+    #         value=False,
+    #         description='Exclure auto-citations'
+    #     )
+        
+    #     log_transform = widgets.Checkbox(
+    #         value=False,
+    #         description='Transformation log'
+    #     )
+        
+    #     update_button = widgets.Button(
+    #         description='Comparer',
+    #         button_style='primary',
+    #         icon='exchange'
+    #     )
+        
+    #     output = widgets.Output()
+        
+    #     # Fonction de mise à jour
+    #     def update_comparison(b):
+    #         with output:
+    #             clear_output(wait=True)
+                
+    #             author1 = author1_search.value
+    #             author2 = author2_search.value
+    #             is_career = dataset_type.value == 'Career'
+    #             year = year_selector.value
+    #             exclude = exclude_self.value
+    #             log_tf = log_transform.value
+                
+    #             if not author1 or not author2:
+    #                 print("Veuillez entrer les deux noms d'auteurs")
+    #                 return
+                
+    #             print(f"Comparaison de {author1} et {author2}...")
+                
+    #             try:
+    #                 fig = self.plot_author_comparison(
+    #                     author1, author2, year, is_career, exclude, log_tf
+    #                 )
+    #                 fig.show()
+                    
+    #                 # Afficher les infos pour les deux auteurs
+    #                 index = "career" if is_career else "singleyr"
+    #                 info1 = self.get_author_info(author1, index)
+    #                 info2 = self.get_author_info(author2, index)
+                    
+    #                 if info1 and info2:
+    #                     print(f"\n{author1.split(',')[0]}:")
+    #                     print(f"  Rang: {info1['rank']} | H-index: {info1['h_index']} | Citations: {info1['total_citations']}")
+                        
+    #                     print(f"\n{author2.split(',')[0]}:")
+    #                     print(f"  Rang: {info2['rank']} | H-index: {info2['h_index']} | Citations: {info2['total_citations']}")
+                
+    #             except Exception as e:
+    #                 print(f"❌ Erreur: {str(e)}")
+        
+    #     update_button.on_click(update_comparison)
+        
+    #     # Layout
+    #     controls = widgets.VBox([
+    #         widgets.HBox([author1_search, author2_search]),
+    #         widgets.HBox([dataset_type, year_selector, update_button]),
+    #         widgets.HBox([exclude_self, log_transform])
+    #     ])
+        
+    #     display(controls, output)
+        
+    #     # Affichage initial
+    #     update_comparison(None)
+
+    def interactive_author_comparison(self):
+        """Interface interactive pour comparer deux auteurs avec le layout spécifié."""
+        
+        # ==========================================================================================
+        # WIDGETS DE CONTRÔLE
+        # ==========================================================================================
+        
+        # Auteur 1
         author1_search = widgets.Combobox(
             value='Ioannidis, John P.A.',
-            placeholder='Commencez à taper...',
+            placeholder='Start typing name and surname...',
             options=[],
-            description='Auteur 1:',
+            description='Author 1:',
             ensure_option=False,
-            style={'description_width': '80px'},
-            layout=widgets.Layout(width='400px')
+            style={'description_width': '100px'},
+            layout=widgets.Layout(width='500px')
         )
+        
         search_status1 = widgets.HTML(value='')
-
-        def update_suggestions1(change):
-            query = change['new']
-            if len(query) >= 3:
-                search_status1.value = '<i>🔍</i>'
-                try:
-                    results = self.search_authors(query, limit=20)
-                    suggestions = [r.get('authfull', '') for r in results if r.get('authfull')]
-                    author1_search.options = suggestions
-                    search_status1.value = f'<i>✓ {len(suggestions)}</i>'
-                except Exception as e:
-                    search_status1.value = f'<i style="color:red">❌</i>'
-            else:
-                author1_search.options = []
-                search_status1.value = ''
-
-        author1_search.observe(update_suggestions1, names='value')
-
-        author2_search = widgets.Combobox(
-            value='Bengio, Yoshua',
-            placeholder='Commencez à taper...',
-            options=[],
-            description='Auteur 2:',
-            ensure_option=False,
-            style={'description_width': '80px'},
-            layout=widgets.Layout(width='400px')
-        )
-         
-        search_status2 = widgets.HTML(value='')
-
-        def update_suggestions2(change):
-            query = change['new']
-            if len(query) >= 3:
-                search_status2.value = '<i>🔍</i>'
-                try:
-                    results = self.search_authors(query, limit=15)
-                    suggestions = [r.get('authfull', '') for r in results if r.get('authfull')]
-                    author2_search.options = suggestions
-                    search_status2.value = f'<i>✓ {len(suggestions)}</i>'
-                except Exception as e:
-                    search_status2.value = f'<i style="color:red">❌</i>'
-            else:
-                author2_search.options = []
-                search_status2.value = ''
         
-        author2_search.observe(update_suggestions2, names='value')
-        
-        dataset_type = widgets.RadioButtons(
+        # Type de données pour Auteur 1
+        career_single_a1 = widgets.Dropdown(
             options=['Career', 'Single Year'],
             value='Career',
             description='Type:',
-            style={'description_width': '80px'}
+            style={'description_width': '100px'}
         )
         
-        year_selector = widgets.Dropdown(
-            options=['2017', '2019', '2020', '2021'],
+        # Année pour Auteur 1
+        year_a1 = widgets.Dropdown(
+            options=['2017', '2018', '2019', '2020', '2021'],
             value='2021',
-            description='Année:',
-            style={'description_width': '80px'}
+            description='Year:',
+            style={'description_width': '60px'},
+            layout=widgets.Layout(width='150px')
         )
         
+        # Auteur 2
+        author2_search = widgets.Combobox(
+            value='Bengio, Yoshua',
+            placeholder='Start typing name and surname...',
+            options=[],
+            description='Author 2:',
+            ensure_option=False,
+            style={'description_width': '100px'},
+            layout=widgets.Layout(width='500px')
+        )
+        
+        search_status2 = widgets.HTML(value='')
+        
+        # Type de données pour Auteur 2
+        career_single_a2 = widgets.Dropdown( 
+            options=['Career', 'Single Year'],
+            value='Career',
+            description='Type:',
+            style={'description_width': '100px'}
+        )
+        
+        # Année pour Auteur 2
+        year_a2 = widgets.Dropdown(
+            options=['2017', '2018', '2019', '2020', '2021'],
+            value='2021',
+            description='Year:',
+            style={'description_width': '60px'},
+            layout=widgets.Layout(width='150px')
+        )
+        
+        # Options globales
         exclude_self = widgets.Checkbox(
             value=False,
-            description='Exclure auto-citations'
+            description='Exclude self-citations',
+            style={'description_width': '100px'}
         )
         
         log_transform = widgets.Checkbox(
             value=False,
-            description='Transformation log'
+            description='Log transformed',
+            style={'description_width': '120px'}
         )
         
         update_button = widgets.Button(
-            description='Comparer',
-            button_style='primary',
-            icon='exchange'
+            description='Compare Authors',
+            button_style='success',
+            icon='refresh',
+            layout=widgets.Layout(width='200px')
         )
         
         output = widgets.Output()
         
-        # Fonction de mise à jour
-        def update_comparison(b):
+        # ==========================================================================================
+        # FONCTIONS DE MISE À JOUR
+        # ==========================================================================================
+        
+        def update_suggestions1(change):
+            query = change['new']
+            if len(query) >= 3:
+                search_status1.value = '<i>Researching...</i>'
+                try:
+                    results = self.search_authors(query, limit=20)
+                    suggestions = [r.get('authfull', '') for r in results if r.get('authfull')]
+                    author1_search.options = suggestions
+                    search_status1.value = f'<i>✓ {len(suggestions)} results found</i>'
+                except Exception as e:
+                    search_status1.value = f'<i style="color:red">Error: {str(e)}</i>'
+            else:
+                author1_search.options = []
+                search_status1.value = '<i>Write at least 3 characters...</i>'
+        
+        def update_suggestions2(change):
+            query = change['new']
+            if len(query) >= 3:
+                search_status2.value = '<i>Researching...</i>'
+                try:
+                    results = self.search_authors(query, limit=20)
+                    suggestions = [r.get('authfull', '') for r in results if r.get('authfull')]
+                    author2_search.options = suggestions
+                    search_status2.value = f'<i>✓ {len(suggestions)} results found</i>'
+                except Exception as e:
+                    search_status2.value = f'<i style="color:red">Error: {str(e)}</i>'
+            else:
+                author2_search.options = []
+                search_status2.value = '<i>Write at least 3 characters...</i>'
+        
+        author1_search.observe(update_suggestions1, names='value')
+        author2_search.observe(update_suggestions2, names='value')
+        
+        # ==========================================================================================
+        # FONCTION PRINCIPALE DE COMPARAISON
+        # ==========================================================================================
+        
+        # def create_comparison_figures(author1, career1, year1, author2, career2, year2, exclude_self, log_transform):
+        #     """Crée une seule figure avec le layout spécifié."""
+            
+        #     # Récupérer les données
+        #     prefix1 = 'career' if career1 else 'singleyr'
+        #     prefix2 = 'career' if career2 else 'singleyr'
+            
+        #     data1 = self.get_author_data(author1, prefix1)
+        #     data2 = self.get_author_data(author2, prefix2)
+            
+        #     if not data1 or not data2:
+        #         return None
+            
+        #     # Extraire les données de l'année
+        #     key1 = f"{prefix1}_{year1}"
+        #     key2 = f"{prefix2}_{year2}"
+            
+        #     if key1 not in data1 or key2 not in data2:
+        #         return None
+            
+        #     metrics1 = data1[key1]
+        #     metrics2 = data2[key2]
+            
+        #     # Définir les métriques
+        #     suffix = ' (ns)' if exclude_self else ''
+        #     metrics_list = ['nc', 'h', 'hm', 'ncs', 'ncsf', 'ncsfl', 'c']
+        #     metrics_with_suffix = [f'{m}{suffix}' for m in metrics_list]
+            
+        #     # Récupérer les valeurs
+        #     values1 = [metrics1.get(m, 0) for m in metrics_with_suffix]
+        #     values2 = [metrics2.get(m, 0) for m in metrics_with_suffix]
+            
+        #     # Rangs
+        #     rank1 = metrics1.get(f'rank{suffix}', 'N/A')
+        #     rank2 = metrics2.get(f'rank{suffix}', 'N/A')
+            
+        #     # Créer UNE SEULE grande figure avec 2 lignes et 7 colonnes
+        #     fig = make_subplots(
+        #         rows=2, cols=7,
+        #         specs=[
+        #             # Ligne 1: Score C (1,1) + Rank A1 (1,3) + Rank A2 (1,5) + 4 vides
+        #             [{'type': 'indicator'}, None, {'type': 'indicator'}, None, {'type': 'indicator'}, None, None],
+        #             # Ligne 2: Les 6 métriques côte à côte
+        #             [{'type': 'bar'}, {'type': 'bar'}, {'type': 'bar'}, {'type': 'bar'}, {'type': 'bar'}, {'type': 'bar'}, None]
+        #         ],
+        #         row_heights=[0.4, 0.6],
+        #         column_widths=[0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.16],
+        #         vertical_spacing=0.1,
+        #         horizontal_spacing=0.05
+        #     )
+            
+        #     # ==================================================================
+        #     # LIGNE 1: Score C (1,1) + Rank A1 (1,3) + Rank A2 (1,5)
+        #     # ==================================================================
+            
+        #     # Score C (1,1)
+        #     c_value = values1[6]  # Le score C est le dernier
+        #     fig.add_trace(
+        #         go.Indicator(
+        #             mode="number+delta",
+        #             value=c_value,
+        #             number={'font': {'color': self.lightAccent1, 'size': 40}},
+        #             title={
+        #                 'text': f"<b>Composite Score<br>{author1.split(',')[0]}</b>",
+        #                 'font': {'color': self.lightAccent1, 'size': 14}
+        #             },
+        #             delta={'reference': values2[6], 'relative': True}
+        #         ),
+        #         row=1, col=1
+        #     )
+            
+        #     # Rank Auteur 1 (1,3)
+        #     fig.add_trace(
+        #         go.Indicator(
+        #             mode="number",
+        #             value=rank1 if isinstance(rank1, (int, float)) else 0,
+        #             number={'font': {'color': self.highlight1, 'size': 50}},
+        #             title={
+        #                 'text': f"<b>Rank<br>{author1.split(',')[0]}</b>",
+        #                 'font': {'color': self.highlight1, 'size': 14}
+        #             }
+        #         ),
+        #         row=1, col=3
+        #     )
+            
+        #     # Rank Auteur 2 (1,5)
+        #     fig.add_trace(
+        #         go.Indicator(
+        #             mode="number",
+        #             value=rank2 if isinstance(rank2, (int, float)) else 0,
+        #             number={'font': {'color': self.highlight2, 'size': 50}},
+        #             title={
+        #                 'text': f"<b>Rank<br>{author2.split(',')[0]}</b>",
+        #                 'font': {'color': self.highlight2, 'size': 14}
+        #             }
+        #         ),
+        #         row=1, col=5
+        #     )
+            
+        #     # ==================================================================
+        #     # LIGNE 2: Les 6 métriques côte à côte (2,1 à 2,6)
+        #     # ==================================================================
+            
+        #     metric_titles = ['NC', 'H', 'Hm', 'NCS', 'NCSF', 'NCSFL']
+        #     full_titles = [
+        #         'Number of citations',
+        #         'H-index', 
+        #         'Hm-index',
+        #         'Citations to single authored',
+        #         'Citations to single+first authored',
+        #         'Citations to single+first+last authored'
+        #     ]
+            
+        #     for i in range(6):
+        #         # Appliquer log si demandé
+        #         y1 = values1[i]
+        #         y2 = values2[i]
+                
+        #         if log_transform:
+        #             y1 = np.log1p(y1) if y1 > 0 else 0
+        #             y2 = np.log1p(y2) if y2 > 0 else 0
+                
+        #         # Auteur 1
+        #         fig.add_trace(
+        #             go.Bar(
+        #                 x=[author1.split(',')[0]],
+        #                 y=[y1],
+        #                 marker_color=self.highlight1,
+        #                 marker_line_width=0,
+        #                 showlegend=(i == 0),
+        #                 name=author1.split(',')[0],
+        #                 text=[f"{values1[i]:.0f}"],
+        #                 textposition='auto',
+        #                 hovertemplate=f'{full_titles[i]}<br>{author1.split(",")[0]}: %{{text}}<extra></extra>'
+        #             ),
+        #             row=2, col=i+1
+        #         )
+                
+        #         # Auteur 2
+        #         fig.add_trace(
+        #             go.Bar(
+        #                 x=[author2.split(',')[0]],
+        #                 y=[y2],
+        #                 marker_color=self.highlight2,
+        #                 marker_line_width=0,
+        #                 showlegend=(i == 0),
+        #                 name=author2.split(',')[0],
+        #                 text=[f"{values2[i]:.0f}"],
+        #                 textposition='auto',
+        #                 hovertemplate=f'{full_titles[i]}<br>{author2.split(",")[0]}: %{{text}}<extra></extra>'
+        #             ),
+        #             row=2, col=i+1
+        #         )
+            
+        #     # ==================================================================
+        #     # MISE EN FORME FINALE
+        #     # ==================================================================
+            
+        #     fig.update_layout(
+        #         height=600,
+        #         plot_bgcolor=self.bgc,
+        #         paper_bgcolor=self.bgc,
+        #         font={'color': self.lightAccent1},
+        #         showlegend=True,
+        #         legend=dict(
+        #             orientation="h",
+        #             yanchor="bottom",
+        #             y=1.02,
+        #             xanchor="center",
+        #             x=0.5
+        #         ),
+        #         title={
+        #             'text': f"Comparison: {author1.split(',')[0]} vs {author2.split(',')[0]}",
+        #             'font': {'size': 20, 'color': self.lightAccent1},
+        #             'x': 0.5
+        #         },
+        #         margin={'l': 20, 'r': 20, 't': 100, 'b': 50}
+        #     )
+            
+        #     # Mise en forme des axes pour les barres
+        #     for i in range(1, 7):
+        #         fig.update_xaxes(
+        #             showgrid=False,
+        #             tickangle=0,
+        #             tickfont={'size': 10},
+        #             row=2, col=i
+        #         )
+        #         fig.update_yaxes(
+        #             showgrid=True,
+        #             gridcolor=self.darkAccent2,
+        #             linecolor=self.darkAccent2,
+        #             row=2, col=i
+        #         )
+            
+        #     return fig
+
+        def create_comparison_figures(author1, career1, year1, author2, career2, year2, exclude_self, log_transform):
+            """Crée une seule figure avec le layout spécifié."""
+            
+            # Récupérer les données
+            prefix1 = 'career' if career1 else 'singleyr'
+            prefix2 = 'career' if career2 else 'singleyr'
+            
+            data1 = self.get_author_data(author1, prefix1)
+            data2 = self.get_author_data(author2, prefix2)
+            
+            if not data1 or not data2:
+                return None
+            
+            # Extraire les données de l'année
+            key1 = f"{prefix1}_{year1}"
+            key2 = f"{prefix2}_{year2}"
+            
+            if key1 not in data1 or key2 not in data2:
+                return None
+            
+            metrics1 = data1[key1]
+            metrics2 = data2[key2]
+            
+            # Définir les métriques
+            suffix = ' (ns)' if exclude_self else ''
+            metrics_list = ['nc', 'h', 'hm', 'ncs', 'ncsf', 'ncsfl', 'c']
+            metrics_with_suffix = [f'{m}{suffix}' for m in metrics_list]
+            
+            # Récupérer les valeurs
+            values1 = [metrics1.get(m, 0) for m in metrics_with_suffix]
+            values2 = [metrics2.get(m, 0) for m in metrics_with_suffix]
+            
+            # Rangs
+            rank1 = metrics1.get(f'rank{suffix}', 'N/A')
+            rank2 = metrics2.get(f'rank{suffix}', 'N/A')
+            
+            # Créer UNE SEULE grande figure avec 2 lignes et 7 colonnes
+            fig = make_subplots(
+                rows=2, cols=6,
+                specs=[
+                    # Ligne 1: Score C (1,1) + Rank A1 (1,3) + Rank A2 (1,5) + 4 vides
+                    [{'type': 'bar'}, None, {'type': 'indicator'}, None, {'type': 'indicator'}, None],
+                    # Ligne 2: Les 6 métriques côte à côte
+                    [{'type': 'bar'}, {'type': 'bar'}, {'type': 'bar'}, {'type': 'bar'}, {'type': 'bar'}, {'type': 'bar'}]
+                ],
+                row_heights=[0.6, 0.6],
+                column_widths=[0.16, 0.16, 0.16, 0.16, 0.16, 0.16],
+                vertical_spacing=0.15,
+                horizontal_spacing=0.02
+            )
+            
+            # ==================================================================
+            # LIGNE 1: Score C (1,1) + Rank A1 (1,3) + Rank A2 (1,5)
+            # ==================================================================
+            
+            # Score C (1,1) - comme une barre comme les autres métriques
+            c_value1 = values1[6]  # Score C auteur 1
+            c_value2 = values2[6]  # Score C auteur 2
+            
+            # Appliquer log si demandé
+            y1_c = c_value1
+            y2_c = c_value2
+            if log_transform:
+                y1_c = np.log1p(y1_c) if y1_c > 0 else 0
+                y2_c = np.log1p(y2_c) if y2_c > 0 else 0
+            
+            # Auteur 1 - Score C
+            fig.add_trace(
+                go.Bar(
+                    x=[author1.split(',')[0]],
+                    y=[y1_c],
+                    marker_color=self.highlight1,
+                    marker_line_width=0,
+                    showlegend=False,
+                    text=[f"{c_value1:.1f}"],
+                    textposition='auto',
+                    hovertemplate=f'Composite Score (C)<br>{author1.split(",")[0]}: %{{text}}<extra></extra>'
+                ),
+                row=1, col=1
+            )
+            
+            # Auteur 2 - Score C
+            fig.add_trace(
+                go.Bar(
+                    x=[author2.split(',')[0]],
+                    y=[y2_c],
+                    marker_color=self.highlight2,
+                    marker_line_width=0,
+                    showlegend=False,
+                    text=[f"{c_value2:.1f}"],
+                    textposition='auto',
+                    hovertemplate=f'Composite Score (C)<br>{author2.split(",")[0]}: %{{text}}<extra></extra>'
+                ),
+                row=1, col=1
+            )
+            
+            # Rank Auteur 1 (1,3)
+            fig.add_trace(
+                go.Indicator(
+                    mode="number",
+                    value=rank1 if isinstance(rank1, (int, float)) else 0,
+                    number={'font': {'color': self.highlight1, 'size': 50}},
+                    title={
+                        'text': f"<b>Rank<br>{author1}</b>",
+                        'font': {'color': self.highlight1, 'size': 14}
+                    }
+                ),
+                row=1, col=3
+            )
+            
+            # Rank Auteur 2 (1,5)
+            fig.add_trace(
+                go.Indicator(
+                    mode="number",
+                    value=rank2 if isinstance(rank2, (int, float)) else 0,
+                    number={'font': {'color': self.highlight2, 'size': 50}},
+                    title={
+                        'text': f"<b>Rank<br>{author2}</b>",
+                        'font': {'color': self.highlight2, 'size': 14}
+                    }
+                ),
+                row=1, col=5
+            )
+            
+            # ==================================================================
+            # LIGNE 2: Les 6 métriques côte à côte (2,1 à 2,6)
+            # ==================================================================
+            
+            metric_titles = ['NC', 'H', 'Hm', 'NCS', 'NCSF', 'NCSFL']
+            full_titles = [
+                'Number of citations',
+                'H-index', 
+                'Hm-index',
+                'Number of citations to single authored papers',
+                'Number of citations to single and first authored papers',
+                'Number of citations to single, first and last authored papers'
+            ]
+            
+            for i in range(6):
+                # Appliquer log si demandé
+                y1 = values1[i]
+                y2 = values2[i]
+                
+                if log_transform:
+                    y1 = np.log1p(y1) if y1 > 0 else 0
+                    y2 = np.log1p(y2) if y2 > 0 else 0
+                
+                # Auteur 1
+                fig.add_trace(
+                    go.Bar(
+                        x=[author1.split(',')[0]],
+                        y=[y1],
+                        marker_color=self.highlight1,
+                        marker_line_width=0,
+                        showlegend= False, #(i == 0),
+                        name=author1.split(',')[0],
+                        text=[f"{values1[i]:.0f}"],
+                        textposition='auto',
+                        hovertemplate=f'{full_titles[i]}<br>{author1.split(",")[0]}: %{{text}}<extra></extra>'
+                    ),
+                    row=2, col=i+1
+                )
+                
+                # Auteur 2
+                fig.add_trace(
+                    go.Bar(
+                        x=[author2.split(',')[0]],
+                        y=[y2],
+                        marker_color=self.highlight2,
+                        marker_line_width=0,
+                        showlegend= False, #(i == 0),
+                        name=author2.split(',')[0],
+                        text=[f"{values2[i]:.0f}"],
+                        textposition='auto',
+                        hovertemplate=f'{full_titles[i]}<br>{author2.split(",")[0]}: %{{text}}<extra></extra>'
+                    ),
+                    row=2, col=i+1
+                )
+            
+            # ==================================================================
+            # MISE EN FORME FINALE
+            # ==================================================================
+            
+            fig.update_layout(
+                height=450,  # Plus court
+                plot_bgcolor=self.bgc,
+                paper_bgcolor=self.bgc,
+                font={'color': self.lightAccent1},
+                showlegend=True,
+                legend=dict(
+                    orientation="h",
+                    yanchor="bottom",
+                    y=1.02,
+                    xanchor="center",
+                    x=0.5
+                ),
+                title={
+                    'text': f"Comparison: {author1} vs {author2}",
+                    'font': {'size': 20, 'color': self.lightAccent1},
+                    'x': 0.5
+                },
+                margin={'l': 20, 'r': 20, 't': 100, 'b': 50},
+                bargap=0.3,  
+                bargroupgap=0.1 
+            )
+            
+            # Mise en forme des axes pour toutes les barres (ligne 1 et 2)
+            for row in [1, 2]:
+                for col in [1, 2, 3, 4, 5, 6]:
+                    if row == 1 and col != 1:  # Sauter les colonnes vides de la ligne 1
+                        continue
+                        
+                    fig.update_xaxes(
+                        showgrid=False,
+                        tickangle=0,
+                        tickfont={'size': 10},
+                        row=row, col=col
+                    )
+                    fig.update_yaxes(
+                        showgrid=True,
+                        gridcolor=self.darkAccent2,
+                        linecolor=self.darkAccent2,
+                        row=row, col=col
+                    )
+            
+            # Titres pour les sous-graphiques
+            annotations = []
+            
+            # Titre pour le Score C (ligne 1, col 1)
+            annotations.append(dict(
+                x=0.07, y=1.05,
+                xref='paper', yref='paper',
+                text='<b>Composite Score (C)</b>',
+                showarrow=False,
+                font=dict(size=12, color=self.lightAccent1),
+                xanchor='center'
+            ))
+            
+            # Titres pour les métriques (ligne 2)
+            metric_positions = [0.08, 0.24, 0.40, 0.56, 0.72, 0.88]
+            for i, title in enumerate(metric_titles):
+                annotations.append(dict(
+                    x=metric_positions[i], y=0.52,
+                    xref='paper', yref='paper',
+                    text=f'<b>{title}</b>',
+                    showarrow=False,
+                    font=dict(size=12, color=self.lightAccent1),
+                    xanchor='center'
+                ))
+            
+            fig.update_layout(annotations=annotations)
+            
+            return fig
+
+        def update_comparison(b=None):
             with output:
                 clear_output(wait=True)
                 
                 author1 = author1_search.value
                 author2 = author2_search.value
-                is_career = dataset_type.value == 'Career'
-                year = year_selector.value
+                career1 = career_single_a1.value
+                career2 = career_single_a2.value
+                year1 = year_a1.value
+                year2 = year_a2.value
                 exclude = exclude_self.value
                 log_tf = log_transform.value
                 
                 if not author1 or not author2:
-                    print("Veuillez entrer les deux noms d'auteurs")
+                    print("❌ Please enter both author names")
                     return
                 
-                print(f"Comparaison de {author1} et {author2}...")
-                
                 try:
-                    fig = self.plot_author_comparison(
-                        author1, author2, year, is_career, exclude, log_tf
+                    fig = create_comparison_figures(
+                        author1, career1, year1, author2, career2, year2, exclude, log_tf
                     )
-                    fig.show()
                     
-                    # Afficher les infos pour les deux auteurs
-                    index = "career" if is_career else "singleyr"
-                    info1 = self.get_author_info(author1, index)
-                    info2 = self.get_author_info(author2, index)
-                    
-                    if info1 and info2:
-                        print(f"\n{author1.split(',')[0]}:")
-                        print(f"  Rang: {info1['rank']} | H-index: {info1['h_index']} | Citations: {info1['total_citations']}")
+                    if fig:
+                        fig.show()
+                    else:
+                        print("❌ No data available for one or both authors")
                         
-                        print(f"\n{author2.split(',')[0]}:")
-                        print(f"  Rang: {info2['rank']} | H-index: {info2['h_index']} | Citations: {info2['total_citations']}")
-                
                 except Exception as e:
-                    print(f"❌ Erreur: {str(e)}")
+                    print(f"❌ Error generating comparison: {str(e)}")
+                    import traceback
+                    traceback.print_exc()
+
         
         update_button.on_click(update_comparison)
         
-        # Layout
-        controls = widgets.VBox([
-            widgets.HBox([author1_search, author2_search]),
-            widgets.HBox([dataset_type, year_selector, update_button]),
-            widgets.HBox([exclude_self, log_transform])
+        # ==========================================================================================
+        # LAYOUT FINAL
+        # ==========================================================================================
+        
+        # Contrôles Auteur 1
+        author1_controls = widgets.VBox([
+            widgets.HBox([author1_search, search_status1]),
+            widgets.HBox([career_single_a1, year_a1])
         ])
         
-        display(controls, output)
+        # Contrôles Auteur 2
+        author2_controls = widgets.VBox([
+            widgets.HBox([author2_search, search_status2]),
+            widgets.HBox([career_single_a2, year_a2])
+        ])
         
-        # Affichage initial
-        update_comparison(None)
-
+        # Options globales
+        global_controls = widgets.HBox([
+            exclude_self,
+            log_transform,
+            update_button
+        ])
+        
+        # Layout principal
+        main_controls = widgets.VBox([
+            widgets.HBox([author1_controls, author2_controls]),
+            global_controls
+        ])
+        
+        # Affichage
+        display(main_controls)
+        display(output)
+        
+        # Chargement initial
+        update_comparison()
     # ========================================================================
     # VISUALISATIONS - CARTES ET AGRÉGATIONS
     # ========================================================================
@@ -1793,8 +2513,7 @@ class TwoPercentersClient:
         
         return interface
     
-    def get_author_info(self, author_name: str, index: str = "career") -> Dict[str, Any]:
-        
+    def get_author_info(self, author_name: str, index: str = "career") -> Dict[str, Any]: 
         """
         Récupère les informations de base d'un auteur.
         
@@ -1834,6 +2553,352 @@ class TwoPercentersClient:
         return {}
 
 
+
+
 #==============================================================================
-#                                   Anciens tests
+ #                                 Anciens tests
 #==============================================================================
+  
+   
+    # def plot_author_metrics_gauge(self, author_name: str, year: str = "2021",
+    #                               career: bool = True, exclude_self_citations: bool = False,
+    #                               comparison_group: str = "country") -> go.Figure:
+    #     """
+    #     Crée des jauges comparant les métriques d'un auteur aux médianes/max du groupe.
+    #     Reproduit la visualisation du dashboard (author_find.py).
+        
+    #     Args:
+    #         author_name: Nom de l'auteur
+    #         year: Année à afficher
+    #         career: True pour career, False pour single year
+    #         exclude_self_citations: Exclure les auto-citations
+    #         comparison_group: "country", "field", ou "institution"
+            
+    #     Returns:
+    #         Figure Plotly avec gauges
+    #     """
+    #     index = "career" if career else "singleyr"
+    #     prefix = "career" if career else "singleyr"
+        
+    #     # Récupérer les données de l'auteur
+    #     data = self.get_author_data(author_name, index=index)
+        
+    #     if not data:
+    #         print(f"Aucune donnée trouvée pour {author_name}")
+    #         return go.Figure()
+        
+    #     key = f"{prefix}_{year}"
+    #     if key not in data:
+    #         print(f"Données non disponibles pour l'année {year}")
+    #         return go.Figure()
+        
+    #     author_data = data[key]
+        
+    #     # Récupérer les données agrégées pour comparaison
+    #     info = self.get_author_info(author_name, index=index)
+        
+    #     # Préparer les métriques
+    #     suffix = ' (ns)' if exclude_self_citations else ''
+    #     metrics_list = [f'nc{suffix}', f'h{suffix}', f'hm{suffix}', 
+    #                    f'ncs{suffix}', f'ncsf{suffix}', f'ncsfl{suffix}']
+        
+    #     metric_titles = ['Total Citations', 'H-index', 'Hm-index',
+    #                     'Cit. Single Auth.', 'Cit. Single+First', 'Cit. Single+First+Last']
+        
+    #     # Créer la figure avec sous-graphiques
+    #     fig = make_subplots(
+    #         rows=2, cols=3,
+    #         specs=[[{'type': 'indicator'}] * 3,
+    #                [{'type': 'indicator'}] * 3],
+    #         subplot_titles=metric_titles,
+    #         vertical_spacing=0.15,
+    #         horizontal_spacing=0.1
+    #     )
+        
+    #     # Valeurs de l'auteur
+    #     author_values = [author_data.get(m, 0) for m in metrics_list]
+        
+    #     # Dans la vraie implémentation, ces valeurs viendraient de get_es_aggregate
+    #     for i, (metric, title, value) in enumerate(zip(metrics_list, metric_titles, author_values)):
+    #         row = (i // 3) + 1
+    #         col = (i % 3) + 1
+            
+    #         # Estimer médiane et max (à remplacer par vraies valeurs API)
+    #         median = value * 0.7 if value > 0 else 100
+    #         max_val = value * 1.5 if value > 0 else 1000
+            
+            
+    #         fig.add_trace(
+    #             go.Indicator(
+    #                 mode="gauge+number+delta",
+    #                 value=value,
+    #                 delta={'reference': median, 
+    #                       'increasing': {'color': "limegreen"},
+    #                       'decreasing': {'color': "indianred"}},
+    #                 gauge={
+    #                     'axis': {'range': [None, max_val], 'tickcolor': "#aaa"},
+    #                     'bar': {'color': 'lightseagreen'},
+    #                     'threshold': {
+    #                         'line': {'color': "red", 'width': 4},
+    #                         'thickness': 0.75,
+    #                         'value': median
+    #                     }
+    #                 },
+    #                 title={'text': title, 'font': {'color': '#aaa', 'size': 12}}
+    #             ),
+    #             row=row, col=col
+    #         )
+        
+    #     # Mise en forme
+    #     fig.update_layout(
+    #         height=500,
+    #         plot_bgcolor=self.bgc,
+    #         paper_bgcolor=self.bgc,
+    #         font=dict(color='lightseagreen', size=10),
+    #         title={
+    #             'text': f"{author_name} - Métriques {year}",
+    #             'font': {'size': 16, 'color': self.lightAccent1},
+    #             'x': 0.5
+    #         },
+    #         margin={'l': 20, 'r': 20, 't': 80, 'b': 20}
+    #     )
+        
+    #     return fig
+
+
+# def plot_author_career(self, author_name: str, exclude_self_citations: bool = False,
+#                         width: int = 1200, height: int = 2000) -> go.Figure:
+#     """Crée un graphique montrant l'évolution des métriques d'un auteur sur sa carrière."""
+
+#     data = self.get_author_data(author_name, index="career")
+    
+#     if not data:
+#         print(f"Aucune donnée trouvée pour {author_name}")
+#         return go.Figure()
+    
+#     # Extraire les années et les données
+#     years = []
+#     metrics_data = []
+    
+#     for key in sorted(data.keys()):
+#         if key.endswith('_log'):
+#             continue
+#         parts = key.split('_')
+#         if len(parts) == 2 and parts[0] == 'career':
+#             years.append(parts[1])
+#             metrics_data.append(data[key])
+    
+#     if not years:
+#         print(f"Aucune donnée temporelle trouvée pour {author_name}")
+#         return go.Figure()
+    
+#     # Créer le DataFrame
+#     df = pd.DataFrame(metrics_data)
+#     df['Year'] = years
+#     df['self%'] = df['self%'] * 100
+    
+#     # Définir les métriques à afficher
+#     suffix = ' (ns)' if exclude_self_citations else ''
+#     metrics_list = [
+#         f'rank{suffix}', f'c{suffix}', f'nc{suffix}', f'h{suffix}', 
+#         f'hm{suffix}', f'ncs{suffix}', f'ncsf{suffix}', f'ncsfl{suffix}',
+#         f'nps{suffix}', f'cpsf{suffix}', f'npsfl{suffix}', f'npciting{suffix}',
+#         'np', 'self%'
+#     ]
+    
+#     # Filtrer les métriques disponibles
+#     available_metrics = [m for m in metrics_list if m in df.columns]
+    
+#     # Créer les sous-titres
+#     subplot_titles = [self._get_metric_long_name(True, m) 
+#                         for m in available_metrics]
+    
+#     # Créer la figure
+#     fig = make_subplots(
+#         rows=len(available_metrics), 
+#         cols=1, 
+#         subplot_titles=subplot_titles,
+#         vertical_spacing=0.02
+#     )
+    
+#     # Palette de couleurs
+#     col_list = px.colors.sample_colorscale("turbo", 
+#                                             [n/(100-1) for n in range(100)])
+    
+#     # Ajouter les traces
+#     for i, metric in enumerate(available_metrics):
+#         fig.add_trace(
+#             go.Scatter(
+#                 x=df['Year'], 
+#                 y=df[metric],
+#                 marker=dict(color=col_list[len(col_list) - i - 25]),
+#                 name=metric,
+#                 hovertemplate='Année: %{x}<br>Valeur: %{y}<extra></extra>'
+#             ), 
+#             row=i + 1, 
+#             col=1
+#         )
+    
+#     # Mise en forme
+#     fig.update_xaxes(
+#         tickvals=years, 
+#         ticktext=years, 
+#         gridcolor=self.darkAccent2, 
+#         linecolor=self.darkAccent2, 
+#         zeroline=False
+#     )
+#     fig.update_yaxes(
+#         gridcolor=self.darkAccent2, 
+#         linecolor=self.darkAccent2, 
+#         zeroline=False
+#     )
+#     fig.update_layout(
+#         plot_bgcolor=self.bgc, 
+#         paper_bgcolor=self.bgc, 
+#         font=dict(color=self.lightAccent1),
+#         height=height,
+#         width=width,
+#         showlegend=False,
+#         title={
+#             'text': f"Données carrière: {author_name}", 
+#             'font': {'size': 20}
+#         }, 
+#         title_x=0.5
+#     )
+    
+#     return fig
+
+
+# def _get_metric_long_name(self, career: bool, metric: str, yr: int, include_year: bool ) -> str:
+#     """Obtient le nom complet d'une métrique."""
+#     metric_names = {
+#         'rank (ns)': 'Rank (no self-citations)',
+#         'nc (ns)': 'Total citations (no self-cit.)',
+#         'h (ns)': 'H-index (no self-cit.)',
+#         'hm (ns)': 'Hm-index (no self-cit.)',
+#         'nps (ns)': '# single authored papers (no self-cit.)',
+#         'ncs (ns)': 'Cit. to single authored papers (no self-cit.)',
+#         'cpsf (ns)': '# single + first authored papers (no self-cit.)',
+#         'ncsf (ns)': 'Cit. to single + first authored (no self-cit.)',
+#         'npsfl (ns)': '# single + first + last authored (no self-cit.)',
+#         'ncsfl (ns)': 'Cit. to single + first + last (no self-cit.)',
+#         'c (ns)': 'Composite score (no self-cit.)',
+#         'npciting (ns)': '# distinct citing papers (no self-cit.)',
+#         'rank': 'Rank',
+#         'nc': 'Total citations',
+#         'h': 'H-index',
+#         'hm': 'Hm-index',
+#         'nps': '# single authored papers',
+#         'ncs': 'Citations to single authored papers',
+#         'cpsf': '# single + first authored papers',
+#         'ncsf': 'Citations to single + first authored',
+#         'npsfl': '# single + first + last authored',
+#         'ncsfl': 'Citations to single + first + last',
+#         'c': 'Composite score',
+#         'npciting': '# distinct citing papers',
+#         'np': '# papers',
+#         'self%': 'Self-citation %'
+#     }
+#     return metric_names.get(metric, metric)
+
+# def get_metric_long_name(career, yr, metric, include_year = True):
+        # yrs = [2017, 2018, 2019, 2020, 2021]
+        # if yr == 0: year = 2017
+        # if yr != 0 and career == False: yr = yr + 1
+        # year = yrs[yr]
+        # if include_year == True: metric_name_dict = {
+        #     'authfull':'author name',
+        #     'inst_name':'institution name (large institutions only)',
+        #     'cntry':'country associated with most recent institution',
+        #     'np':f'number of papers from 1960 to {year}',
+        #     'firstyr':'year of first publication',
+        #     'lastyr':'year of most recent publication',
+        #     'rank (ns)':'rank based on composite score c', 
+        #     'nc (ns)':f'total cites from 1996 to {year}', 
+        #     'h (ns)':f'h-index as of the end of {year}', 
+        #     'hm (ns)':f'hm-index as of end-{year}',
+        #     'nps (ns)':'number of single authored papers',
+        #     'ncs (ns)':'total cites to single authored papers', 
+        #     'cpsf (ns)':'number of single + first authored papers', 
+        #     'ncsf (ns)':'total cites to single + first authored papers', 
+        #     'npsfl (ns)':'number of single + first + last authored papers', 
+        #     'ncsfl (ns)':'total cites to single + first + last authored papers',
+        #     'c (ns)':'composite score', 
+        #     'npciting (ns)':'number of distinct citing papers', 
+        #     'cprat (ns)':'ratio of total citations to distinct citing papers', 
+        #     'np cited (ns)':f'number of papers 1960-{year} that have been cited at least once (1996-{year})',
+        #     'self%':'self-citation percentage', 
+        #     'rank':'rank based on composite score c', 
+        #     'nc':f'total cites 1996-{year}', 
+        #     'h':f'h-index as of end-{year}',
+        #     'hm':f'hm-index as of end-{year}', 
+        #     'nps':'number of single authored papers',
+        #     'ncs':'total cites to single authored papers', 
+        #     'cpsf':'number of single + first authored papers', 
+        #     'ncsf':'total cites to single + first authored papers', 
+        #     'npsfl':'number of single + first + last authored papers', 
+        #     'ncsfl':'total cites to single + first + last authored papers',
+        #     'c':'composite score', 
+        #     'npciting':'number of distinct citing papers', 
+        #     'cprat':'ratio of total citations to distinct citing papers', 
+        #     'np cited':f'number of papers 1960-{year} that have been cited at least once (1996-{year})',
+        #     'np_d':f'# papers 1960-{year} in titles that are discontinued in Scopus', 
+        #     'nc_d':f'total cites 1996-{year} from titles that are discontinued in Scopus', 
+        #     'sm-subfield-1':'top ranked Science-Metrix category (subfield) for author', 
+        #     'sm-subfield-1-frac':'associated category fraction',
+        #     'sm-subfield-2':'second ranked Science-Metrix category (subfield) for author', 
+        #     'sm-subfield-2-frac':'associated category fraction', 
+        #     'sm-field':'top ranked higher-level Science-Metrix category (field) for author', 
+        #     'sm-field-frac':'associated category fraction',
+        #     'rank sm-subfield-1':'rank of c within category sm-subfield-1', 
+        #     'rank sm-subfield-1 (ns)':'rank of c (ns) within category sm-subfield-1', 
+        #     'sm-subfield-1 count':'total number of authors within category sm-subfield-1'}
+        # else: metric_name_dict = {
+        #     'authfull':'author name',
+        #     'inst_name':'institution name (large institutions only)',
+        #     'cntry':'country associated with most recent institution',
+        #     'np':f'number of papers',
+        #     'firstyr':'year of first publication',
+        #     'lastyr':'year of most recent publication',
+        #     'rank (ns)':'rank based on composite score c', 
+        #     'nc (ns)':f'total cites', 
+        #     'h (ns)':f'h-index', 
+        #     'hm (ns)':f'hm-index',
+        #     'nps (ns)':'number of single authored papers',
+        #     'ncs (ns)':'total cites to single authored papers', 
+        #     'cpsf (ns)':'number of single + first authored papers', 
+        #     'ncsf (ns)':'total cites to single + first authored papers', 
+        #     'npsfl (ns)':'number of single + first + last authored papers', 
+        #     'ncsfl (ns)':'total cites to single + first + last authored papers',
+        #     'c (ns)':'composite score', 
+        #     'npciting (ns)':'number of distinct citing papers', 
+        #     'cprat (ns)':'ratio of total citations to distinct citing papers', 
+        #     'np cited (ns)':f'number of papers published since 1960 that have been cited at least', # since 1996 for career wide!
+        #     'self%':'self-citation percentage', 
+        #     'rank':'rank based on composite score c', 
+        #     'nc':f'total cites', 
+        #     'h':f'h-index',
+        #     'hm':f'hm-index', 
+        #     'nps':'number of single authored papers',
+        #     'ncs':'total cites to single authored papers', 
+        #     'cpsf':'number of single + first authored papers', 
+        #     'ncsf':'total cites to single + first authored papers', 
+        #     'npsfl':'number of single + first + last authored papers', 
+        #     'ncsfl':'total cites to single + first + last authored papers',
+        #     'c':'composite score', 
+        #     'npciting':'number of distinct citing papers', 
+        #     'cprat':'ratio of total citations to distinct citing papers', 
+        #     'np cited':f'number of papers published since 1960 that have been cited at least', # since 1996 for career wide!
+        #     'np_d':f'# papers since 1960 in titles that are discontinued in Scopus', 
+        #     'nc_d':f'total cites since 1996 from titles that are discontinued in Scopus', 
+        #     'sm-subfield-1':'top ranked Science-Metrix category (subfield) for author', 
+        #     'sm-subfield-1-frac':'associated category fraction',
+        #     'sm-subfield-2':'second ranked Science-Metrix category (subfield) for author', 
+        #     'sm-subfield-2-frac':'associated category fraction', 
+        #     'sm-field':'top ranked higher-level Science-Metrix category (field) for author', 
+        #     'sm-field-frac':'associated category fraction',
+        #     'rank sm-subfield-1':'rank of c within category sm-subfield-1', 
+        #     'rank sm-subfield-1 (ns)':'rank of c (ns) within category sm-subfield-1', 
+        #     'sm-subfield-1 count':'total number of authors within category sm-subfield-1'}
+        # return metric_name_dict.get(metric, metric)
+        # return metric_name_dict[metric]
