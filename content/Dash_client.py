@@ -163,7 +163,6 @@ class TwoPercentersClient:
         try:
             if group == 'cntry':
                 # Convertir le nom du pays en code ISO3 comme dans le serveur
-                import country_converter as coco
                 cur_country = coco.convert(names=group_name, to='ISO3')
                 results = self.get_es_results(cur_country.lower(), f'{prefix}_cntry', 'cntry', True)
             elif group == "sm-field":
@@ -187,10 +186,7 @@ class TwoPercentersClient:
         """
         Recherche dans ElasticSearch - version adaptée pour le client
         """
-        # Vous devrez adapter cette fonction selon votre configuration client
-        # Pour l'instant, je vais utiliser une version simplifiée
         try:
-            # Si vous avez accès à l'instance es dans votre client:
             if exact:
                 result = self.es.search(
                     index=idx_name,
@@ -244,9 +240,6 @@ class TwoPercentersClient:
         """
         Décode les données compressées - version client
         """
-
-        # if flg:
-        #     encoded_data = encoded_data[0]
 
         # Base64 decode the data
         compressed_data = base64.b64decode(encoded_data)
@@ -821,7 +814,7 @@ class TwoPercentersClient:
         
         year_selector = widgets.Dropdown(
             options=['2017', '2018', '2019', '2020', '2021'],
-            value='2021',
+            value='2017',
             description='Years:',
             style={'description_width': '100px'}
         )
@@ -1117,7 +1110,7 @@ class TwoPercentersClient:
                         paper_bgcolor=self.bgc,
                         font=dict(color='lightseagreen', size=10),
                         title={
-                            'text': f"Author Metrics - {author} ({year}){status_suffix}",
+                            'text': f"{author} ({year}){status_suffix}",
                             'font': {'size': 20, 'color': self.lightAccent1},
                             'x': 0.5,
                             'y': 0.98
@@ -1175,170 +1168,6 @@ class TwoPercentersClient:
         update_plot(None)
         
     #author_vs_author_layout
-    # def interactive_author_comparison(self):
-    #     """
-    #     Interface interactive pour comparer deux auteurs.
-    #     Reproduit l'interface de author_vs_author_layout.
-    #     """
-    #     # Widgets de contrôle
-    #     # author1_search = widgets.Text(
-    #     #     value='Ioannidis, John P.A.',
-    #     #     placeholder='Nom, Prénom',
-    #     #     description='Auteur 1:',
-    #     #     style={'description_width': '80px'},
-    #     #     layout=widgets.Layout(width='350px')
-    #     # )
-        
-    #     # author2_search = widgets.Text(
-    #     #     value='Bengio, Yoshua',
-    #     #     placeholder='Nom, Prénom',
-    #     #     description='Auteur 2:',
-    #     #     style={'description_width': '80px'},
-    #     #     layout=widgets.Layout(width='350px')
-    #     # )
-
-    #     author1_search = widgets.Combobox(
-    #         value='Ioannidis, John P.A.',
-    #         placeholder='Commencez à taper...',
-    #         options=[],
-    #         description='Auteur 1:',
-    #         ensure_option=False,
-    #         style={'description_width': '80px'},
-    #         layout=widgets.Layout(width='400px')
-    #     )
-    #     search_status1 = widgets.HTML(value='')
-
-    #     def update_suggestions1(change):
-    #         query = change['new']
-    #         if len(query) >= 3:
-    #             search_status1.value = '<i>🔍</i>'
-    #             try:
-    #                 results = self.search_authors(query, limit=20)
-    #                 suggestions = [r.get('authfull', '') for r in results if r.get('authfull')]
-    #                 author1_search.options = suggestions
-    #                 search_status1.value = f'<i>✓ {len(suggestions)}</i>'
-    #             except Exception as e:
-    #                 search_status1.value = f'<i style="color:red">❌</i>'
-    #         else:
-    #             author1_search.options = []
-    #             search_status1.value = ''
-
-    #     author1_search.observe(update_suggestions1, names='value')
-
-    #     author2_search = widgets.Combobox(
-    #         value='Bengio, Yoshua',
-    #         placeholder='Commencez à taper...',
-    #         options=[],
-    #         description='Auteur 2:',
-    #         ensure_option=False,
-    #         style={'description_width': '80px'},
-    #         layout=widgets.Layout(width='400px')
-    #     )
-         
-    #     search_status2 = widgets.HTML(value='')
-
-    #     def update_suggestions2(change):
-    #         query = change['new']
-    #         if len(query) >= 3:
-    #             search_status2.value = '<i>🔍</i>'
-    #             try:
-    #                 results = self.search_authors(query, limit=15)
-    #                 suggestions = [r.get('authfull', '') for r in results if r.get('authfull')]
-    #                 author2_search.options = suggestions
-    #                 search_status2.value = f'<i>✓ {len(suggestions)}</i>'
-    #             except Exception as e:
-    #                 search_status2.value = f'<i style="color:red">❌</i>'
-    #         else:
-    #             author2_search.options = []
-    #             search_status2.value = ''
-        
-    #     author2_search.observe(update_suggestions2, names='value')
-        
-    #     dataset_type = widgets.RadioButtons(
-    #         options=['Career', 'Single Year'],
-    #         value='Career',
-    #         description='Type:',
-    #         style={'description_width': '80px'}
-    #     )
-        
-    #     year_selector = widgets.Dropdown(
-    #         options=['2017', '2019', '2020', '2021'],
-    #         value='2021',
-    #         description='Année:',
-    #         style={'description_width': '80px'}
-    #     )
-        
-    #     exclude_self = widgets.Checkbox(
-    #         value=False,
-    #         description='Exclure auto-citations'
-    #     )
-        
-    #     log_transform = widgets.Checkbox(
-    #         value=False,
-    #         description='Transformation log'
-    #     )
-        
-    #     update_button = widgets.Button(
-    #         description='Comparer',
-    #         button_style='primary',
-    #         icon='exchange'
-    #     )
-        
-    #     output = widgets.Output()
-        
-    #     # Fonction de mise à jour
-    #     def update_comparison(b):
-    #         with output:
-    #             clear_output(wait=True)
-                
-    #             author1 = author1_search.value
-    #             author2 = author2_search.value
-    #             is_career = dataset_type.value == 'Career'
-    #             year = year_selector.value
-    #             exclude = exclude_self.value
-    #             log_tf = log_transform.value
-                
-    #             if not author1 or not author2:
-    #                 print("Veuillez entrer les deux noms d'auteurs")
-    #                 return
-                
-    #             print(f"Comparaison de {author1} et {author2}...")
-                
-    #             try:
-    #                 fig = self.plot_author_comparison(
-    #                     author1, author2, year, is_career, exclude, log_tf
-    #                 )
-    #                 fig.show()
-                    
-    #                 # Afficher les infos pour les deux auteurs
-    #                 index = "career" if is_career else "singleyr"
-    #                 info1 = self.get_author_info(author1, index)
-    #                 info2 = self.get_author_info(author2, index)
-                    
-    #                 if info1 and info2:
-    #                     print(f"\n{author1.split(',')[0]}:")
-    #                     print(f"  Rang: {info1['rank']} | H-index: {info1['h_index']} | Citations: {info1['total_citations']}")
-                        
-    #                     print(f"\n{author2.split(',')[0]}:")
-    #                     print(f"  Rang: {info2['rank']} | H-index: {info2['h_index']} | Citations: {info2['total_citations']}")
-                
-    #             except Exception as e:
-    #                 print(f"❌ Erreur: {str(e)}")
-        
-    #     update_button.on_click(update_comparison)
-        
-    #     # Layout
-    #     controls = widgets.VBox([
-    #         widgets.HBox([author1_search, author2_search]),
-    #         widgets.HBox([dataset_type, year_selector, update_button]),
-    #         widgets.HBox([exclude_self, log_transform])
-    #     ])
-        
-    #     display(controls, output)
-        
-    #     # Affichage initial
-    #     update_comparison(None)
-
     def interactive_author_comparison(self):
         """Interface interactive pour comparer deux auteurs avec le layout spécifié."""
         
@@ -1370,7 +1199,7 @@ class TwoPercentersClient:
         # Année pour Auteur 1
         year_a1 = widgets.Dropdown(
             options=['2017', '2018', '2019', '2020', '2021'],
-            value='2021',
+            value='2017',
             description='Year:',
             style={'description_width': '60px'},
             layout=widgets.Layout(width='150px')
@@ -1400,7 +1229,7 @@ class TwoPercentersClient:
         # Année pour Auteur 2
         year_a2 = widgets.Dropdown(
             options=['2017', '2018', '2019', '2020', '2021'],
-            value='2021',
+            value='2017',
             description='Year:',
             style={'description_width': '60px'},
             layout=widgets.Layout(width='150px')
@@ -1468,202 +1297,6 @@ class TwoPercentersClient:
         # ==========================================================================================
         # FONCTION PRINCIPALE DE COMPARAISON
         # ==========================================================================================
-        
-        # def create_comparison_figures(author1, career1, year1, author2, career2, year2, exclude_self, log_transform):
-        #     """Crée une seule figure avec le layout spécifié."""
-            
-        #     # Récupérer les données
-        #     prefix1 = 'career' if career1 else 'singleyr'
-        #     prefix2 = 'career' if career2 else 'singleyr'
-            
-        #     data1 = self.get_author_data(author1, prefix1)
-        #     data2 = self.get_author_data(author2, prefix2)
-            
-        #     if not data1 or not data2:
-        #         return None
-            
-        #     # Extraire les données de l'année
-        #     key1 = f"{prefix1}_{year1}"
-        #     key2 = f"{prefix2}_{year2}"
-            
-        #     if key1 not in data1 or key2 not in data2:
-        #         return None
-            
-        #     metrics1 = data1[key1]
-        #     metrics2 = data2[key2]
-            
-        #     # Définir les métriques
-        #     suffix = ' (ns)' if exclude_self else ''
-        #     metrics_list = ['nc', 'h', 'hm', 'ncs', 'ncsf', 'ncsfl', 'c']
-        #     metrics_with_suffix = [f'{m}{suffix}' for m in metrics_list]
-            
-        #     # Récupérer les valeurs
-        #     values1 = [metrics1.get(m, 0) for m in metrics_with_suffix]
-        #     values2 = [metrics2.get(m, 0) for m in metrics_with_suffix]
-            
-        #     # Rangs
-        #     rank1 = metrics1.get(f'rank{suffix}', 'N/A')
-        #     rank2 = metrics2.get(f'rank{suffix}', 'N/A')
-            
-        #     # Créer UNE SEULE grande figure avec 2 lignes et 7 colonnes
-        #     fig = make_subplots(
-        #         rows=2, cols=7,
-        #         specs=[
-        #             # Ligne 1: Score C (1,1) + Rank A1 (1,3) + Rank A2 (1,5) + 4 vides
-        #             [{'type': 'indicator'}, None, {'type': 'indicator'}, None, {'type': 'indicator'}, None, None],
-        #             # Ligne 2: Les 6 métriques côte à côte
-        #             [{'type': 'bar'}, {'type': 'bar'}, {'type': 'bar'}, {'type': 'bar'}, {'type': 'bar'}, {'type': 'bar'}, None]
-        #         ],
-        #         row_heights=[0.4, 0.6],
-        #         column_widths=[0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.16],
-        #         vertical_spacing=0.1,
-        #         horizontal_spacing=0.05
-        #     )
-            
-        #     # ==================================================================
-        #     # LIGNE 1: Score C (1,1) + Rank A1 (1,3) + Rank A2 (1,5)
-        #     # ==================================================================
-            
-        #     # Score C (1,1)
-        #     c_value = values1[6]  # Le score C est le dernier
-        #     fig.add_trace(
-        #         go.Indicator(
-        #             mode="number+delta",
-        #             value=c_value,
-        #             number={'font': {'color': self.lightAccent1, 'size': 40}},
-        #             title={
-        #                 'text': f"<b>Composite Score<br>{author1.split(',')[0]}</b>",
-        #                 'font': {'color': self.lightAccent1, 'size': 14}
-        #             },
-        #             delta={'reference': values2[6], 'relative': True}
-        #         ),
-        #         row=1, col=1
-        #     )
-            
-        #     # Rank Auteur 1 (1,3)
-        #     fig.add_trace(
-        #         go.Indicator(
-        #             mode="number",
-        #             value=rank1 if isinstance(rank1, (int, float)) else 0,
-        #             number={'font': {'color': self.highlight1, 'size': 50}},
-        #             title={
-        #                 'text': f"<b>Rank<br>{author1.split(',')[0]}</b>",
-        #                 'font': {'color': self.highlight1, 'size': 14}
-        #             }
-        #         ),
-        #         row=1, col=3
-        #     )
-            
-        #     # Rank Auteur 2 (1,5)
-        #     fig.add_trace(
-        #         go.Indicator(
-        #             mode="number",
-        #             value=rank2 if isinstance(rank2, (int, float)) else 0,
-        #             number={'font': {'color': self.highlight2, 'size': 50}},
-        #             title={
-        #                 'text': f"<b>Rank<br>{author2.split(',')[0]}</b>",
-        #                 'font': {'color': self.highlight2, 'size': 14}
-        #             }
-        #         ),
-        #         row=1, col=5
-        #     )
-            
-        #     # ==================================================================
-        #     # LIGNE 2: Les 6 métriques côte à côte (2,1 à 2,6)
-        #     # ==================================================================
-            
-        #     metric_titles = ['NC', 'H', 'Hm', 'NCS', 'NCSF', 'NCSFL']
-        #     full_titles = [
-        #         'Number of citations',
-        #         'H-index', 
-        #         'Hm-index',
-        #         'Citations to single authored',
-        #         'Citations to single+first authored',
-        #         'Citations to single+first+last authored'
-        #     ]
-            
-        #     for i in range(6):
-        #         # Appliquer log si demandé
-        #         y1 = values1[i]
-        #         y2 = values2[i]
-                
-        #         if log_transform:
-        #             y1 = np.log1p(y1) if y1 > 0 else 0
-        #             y2 = np.log1p(y2) if y2 > 0 else 0
-                
-        #         # Auteur 1
-        #         fig.add_trace(
-        #             go.Bar(
-        #                 x=[author1.split(',')[0]],
-        #                 y=[y1],
-        #                 marker_color=self.highlight1,
-        #                 marker_line_width=0,
-        #                 showlegend=(i == 0),
-        #                 name=author1.split(',')[0],
-        #                 text=[f"{values1[i]:.0f}"],
-        #                 textposition='auto',
-        #                 hovertemplate=f'{full_titles[i]}<br>{author1.split(",")[0]}: %{{text}}<extra></extra>'
-        #             ),
-        #             row=2, col=i+1
-        #         )
-                
-        #         # Auteur 2
-        #         fig.add_trace(
-        #             go.Bar(
-        #                 x=[author2.split(',')[0]],
-        #                 y=[y2],
-        #                 marker_color=self.highlight2,
-        #                 marker_line_width=0,
-        #                 showlegend=(i == 0),
-        #                 name=author2.split(',')[0],
-        #                 text=[f"{values2[i]:.0f}"],
-        #                 textposition='auto',
-        #                 hovertemplate=f'{full_titles[i]}<br>{author2.split(",")[0]}: %{{text}}<extra></extra>'
-        #             ),
-        #             row=2, col=i+1
-        #         )
-            
-        #     # ==================================================================
-        #     # MISE EN FORME FINALE
-        #     # ==================================================================
-            
-        #     fig.update_layout(
-        #         height=600,
-        #         plot_bgcolor=self.bgc,
-        #         paper_bgcolor=self.bgc,
-        #         font={'color': self.lightAccent1},
-        #         showlegend=True,
-        #         legend=dict(
-        #             orientation="h",
-        #             yanchor="bottom",
-        #             y=1.02,
-        #             xanchor="center",
-        #             x=0.5
-        #         ),
-        #         title={
-        #             'text': f"Comparison: {author1.split(',')[0]} vs {author2.split(',')[0]}",
-        #             'font': {'size': 20, 'color': self.lightAccent1},
-        #             'x': 0.5
-        #         },
-        #         margin={'l': 20, 'r': 20, 't': 100, 'b': 50}
-        #     )
-            
-        #     # Mise en forme des axes pour les barres
-        #     for i in range(1, 7):
-        #         fig.update_xaxes(
-        #             showgrid=False,
-        #             tickangle=0,
-        #             tickfont={'size': 10},
-        #             row=2, col=i
-        #         )
-        #         fig.update_yaxes(
-        #             showgrid=True,
-        #             gridcolor=self.darkAccent2,
-        #             linecolor=self.darkAccent2,
-        #             row=2, col=i
-        #         )
-            
-        #     return fig
 
         def create_comparison_figures(author1, career1, year1, author2, career2, year2, exclude_self, log_transform):
             """Crée une seule figure avec le layout spécifié."""
@@ -1951,7 +1584,6 @@ class TwoPercentersClient:
                     import traceback
                     traceback.print_exc()
 
-        
         update_button.on_click(update_comparison)
         
         # ==========================================================================================
@@ -1989,916 +1621,1253 @@ class TwoPercentersClient:
         
         # Chargement initial
         update_comparison()
-    # ========================================================================
-    # VISUALISATIONS - CARTES ET AGRÉGATIONS
-    # ========================================================================
-
-    def get_world_map_data(self, year: str = "2021", metric: str = "h", 
-                      career_type: str = "career", statistic: str = "median") -> pd.DataFrame:
-        """
-        Récupère les données formatées pour la carte mondiale directement depuis l'API.
-        
-        Args:
-            year: Année (2021)
-            metric: Métrique ("h", "nc", "hm", etc.)
-            career_type: "career" ou "singleyr" 
-            statistic: "min", "25", "median", "75", "max"
-            
-        Returns:
-            DataFrame avec les données des pays
-        """
-        try:
-            # Récupérer les données agrégées par pays
-            aggregate_data = self.get_aggregate_data("country", 
-                                                year=year if career_type == "singleyr" else None)
-            
-            if not aggregate_data:
-                print("❌ Aucune donnée agrégée trouvée")
-                return pd.DataFrame()
-            
-            # Mapping des statistiques
-            stat_map = {'min': 0, '25': 1, 'median': 2, '75': 3, 'max': 4}
-            stat_idx = stat_map.get(statistic, 2)
-            
-            data_list = []
-            
-            for country_data in aggregate_data:
-                country_code = country_data.get('cntry', '').upper()
-                
-                # Décompresser les données si nécessaire
-                if 'data' in country_data and isinstance(country_data['data'], str):
-                    try:
-                        decompressed_data = self.base64_decode_and_decompress(country_data['data'])
-                    except Exception as e:
-                        print(f"❌ Erreur décompression {country_code}: {e}")
-                        continue
-                else:
-                    decompressed_data = country_data.get('data', {})
-                
-                # Clé pour l'année et type de données
-                year_key = f"{career_type}_{year}"
-                
-                if year_key in decompressed_data:
-                    year_data = decompressed_data[year_key]
-                    
-                    if metric in year_data:
-                        metric_value = year_data[metric]
-                        
-                        # Extraire la valeur statistique
-                        if isinstance(metric_value, list) and len(metric_value) > stat_idx:
-                            value = metric_value[stat_idx]
-                        else:
-                            value = metric_value
-                        
-                        # Convertir le code pays en nom et code ISO3
-                        try:
-                            country_name = coco.convert(country_code, to='name_short')
-                            iso_code = coco.convert(country_code, to='ISO3')
-                        except:
-                            country_name = country_code
-                            iso_code = country_code
-                        
-                        data_list.append({
-                            'code': iso_code,
-                            'country': country_name,
-                            'value': float(value),
-                            'metric': metric,
-                            'statistic': statistic,
-                            'year': year,
-                            'career_type': career_type
-                        })
-            
-            print(f"✅ Données préparées pour {len(data_list)} pays")
-            return pd.DataFrame(data_list)
-            
-        except Exception as e:
-            print(f"❌ Erreur dans get_world_map_data: {e}")
-            return pd.DataFrame()
     
-    # def get_world_data(self, year: str = "2021", metric: str = "h", 
-    #               career_type: str = "career", statistic: str = "median") -> pd.DataFrame:
-    #     """
-    #     Récupère et formate les données pour la carte mondiale
-    #     """
-    #     try:
-    #         # Récupérer les données agrégées par pays
-    #         aggregate_data = self.get_aggregate_data("country", 
-    #                                             year=year if career_type == "singleyr" else None)
+    #author_vs_group_layout
+    def interactive_author_vs_group_comparison(self):
+        # ==========================================================================================
+        # WIDGETS DE CONTRÔLE - AUTEUR
+        # ==========================================================================================
+        
+        # Recherche d'auteur
+        author_search = widgets.Combobox(
+            value='Ioannidis, John P.A.',
+            placeholder='Start typing name and surname...',
+            options=[],
+            description='Author:',
+            ensure_option=False,
+            style={'description_width': '100px'},
+            layout=widgets.Layout(width='500px')
+        )
+        
+        search_status = widgets.HTML(value='')
+        
+        # Type de données pour l'auteur
+        career_single_author = widgets.Dropdown(
+            options=['Career', 'Single Year'],
+            value='Career',
+            description='Dataset:',
+            style={'description_width': '100px'}
+        )
+        
+        # Année pour l'auteur
+        year_author = widgets.Dropdown(
+            options=['2017', '2018', '2019', '2020', '2021'],
+            value='2021',
+            description='Year:',
+            style={'description_width': '60px'},
+            layout=widgets.Layout(width='150px')
+        )
+        
+        # ==========================================================================================
+        # WIDGETS DE CONTRÔLE - GROUPE
+        # ==========================================================================================
+        
+        # Type de groupe
+        group_type = widgets.Dropdown(
+            options=[
+                {'label': 'Country', 'value': 'cntry'},
+                {'label': 'Field', 'value': 'sm-field'}, 
+                {'label': 'Institution', 'value': 'inst_name'}
+            ],
+            value='sm-field',
+            description='Group:',
+            style={'description_width': '100px'},
+            layout=widgets.Layout(width='200px')
+        )
+        
+        # Sélection du groupe spécifique
+        group_selection = widgets.Combobox(
+            value='Clinical Medicine',
+            placeholder='Select group...',
+            options=[],
+            description='Select:',
+            ensure_option=False,
+            style={'description_width': '100px'},
+            layout=widgets.Layout(width='400px')
+        )
+        
+        group_status = widgets.HTML(value='')
+        
+        # ==========================================================================================
+        # OPTIONS GLOBALES
+        # ==========================================================================================
+        
+        exclude_self = widgets.Checkbox(
+            value=False,
+            description='Exclude self-citations',
+            style={'description_width': '150px'}
+        )
+        
+        log_transform = widgets.Checkbox(
+            value=False,
+            description='Log transformed',
+            style={'description_width': '150px'}
+        )
+        
+        update_button = widgets.Button(
+            description='Generate Comparison',
+            button_style='success',
+            icon='refresh',
+            layout=widgets.Layout(width='250px')
+        )
+        
+        # ==========================================================================================
+        # ZONES D'AFFICHAGE
+        # ==========================================================================================
+        
+        # Cartes d'information
+        info_output = widgets.Output(layout=widgets.Layout(
+            width='100%',
+            height='150px',
+            border='1px solid gray'
+        ))
+        
+        # Figures principales
+        figures_output = widgets.Output(layout=widgets.Layout(
+            width='100%', 
+            height='600px',
+            border='1px solid gray'
+        ))
+        
+        # Score C et formule
+        c_score_output = widgets.Output(layout=widgets.Layout(
+            width='100%',
+            height='400px', 
+            border='1px solid gray'
+        ))
+        
+        # ==========================================================================================
+        # FONCTIONS DE MISE À JOUR
+        # ==========================================================================================
+        
+        def update_author_suggestions(change):
+            query = change['new']
+            if len(query) >= 3:
+                search_status.value = '<i>Researching...</i>'
+                try:
+                    results = self.search_authors(query, limit=20)
+                    suggestions = [r.get('authfull', '') for r in results if r.get('authfull')]
+                    author_search.options = suggestions
+                    search_status.value = f'<i>✓ {len(suggestions)} results found</i>'
+                except Exception as e:
+                    search_status.value = f'<i style="color:red">Error: {str(e)}</i>'
+            else:
+                author_search.options = []
+                search_status.value = '<i>Write at least 3 characters...</i>'
+        
+        def update_group_suggestions(change):
+            query = change['new']
+            group = group_type.value
             
-    #         if not aggregate_data:
-    #             print("❌ No aggregate data found")
-    #             return pd.DataFrame()
+            if not group or len(query) < 2:
+                group_selection.options = []
+                group_status.value = ''
+                return
+                
+            group_status.value = '<i>Loading groups...</i>'
             
-    #         # Mapping des statistiques
-    #         stat_map = {'min': 0, '25': 1, 'median': 2, '75': 3, 'max': 4}
-    #         stat_idx = stat_map.get(statistic, 2)
-            
-    #         # Mapping des noms de pays
-    #         country_mapping = {
-    #             'SUX': 'RUS',  # Russia
-    #             'ANT': 'NLD',  # Netherlands
-    #             'SCG': 'CZE'   # Czech Republic
-    #         }
-            
-    #         # Préparer les données
-    #         data_list = []
-            
-    #         for country_data in aggregate_data:
-    #             country_code = country_data.get('cntry', '').upper()
+            try:
+                # Déterminer le type de données
+                career = career_single_author.value == 'Career'
+                year = year_author.value
                 
-    #             # Corriger les codes spéciaux
-    #             if country_code in country_mapping:
-    #                 country_code = country_mapping[country_code]
+                # Récupérer les options disponibles via l'API aggregate
+                url = f"{self.base_url}/aggregate/{'country' if group == 'cntry' else 'field' if group == 'sm-field' else 'institution'}"
+                params = {'limit': 500}
                 
-    #             # Obtenir le nom du pays
-    #             try:
-    #                 country_name = coco.convert(country_code, to='name_short')
-    #                 iso_code = coco.convert(country_code, to='ISO3')
-    #             except:
-    #                 country_name = country_code
-    #                 iso_code = country_code
-                
-    #             # La clé pour les données
-    #             year_key = f"{career_type}_{year}"
-                
-    #             # Extraire la valeur de la métrique
-    #             value = None
-                
-    #             # Chercher dans différentes structures
-    #             if year_key in country_data:
-    #                 data_source = country_data[year_key]
-    #             elif 'data' in country_data and year_key in country_data['data']:
-    #                 data_source = country_data['data'][year_key]
-    #             else:
-    #                 continue  # Pas de données pour cette année
+                if not career:
+                    params['year'] = year
                     
-    #             if metric in data_source:
-    #                 metric_value = data_source[metric]
-    #                 value = self._extract_statistic(metric_value, stat_idx)
+                response = self.session.get(url, params=params)
+                response.raise_for_status()
                 
-    #             if value is not None:
-    #                 data_list.append({
-    #                     'code': iso_code,
-    #                     'country': country_name,
-    #                     'value': value,
-    #                     'metric': metric,
-    #                     'statistic': statistic,
-    #                     'year': year
-    #                 })
+                data = response.json()
+                results = data.get('results', [])
+                
+                # Extraire les noms des groupes
+                group_options = []
+                for result in results:
+                    if group == 'cntry':
+                        country_code = result.get('cntry', '')
+                        if country_code and country_code not in ['csk', 'nan']:
+                            country_name = coco.convert(country_code, to='name_short')
+                            if country_name and query.lower() in country_name.lower():
+                                group_options.append(country_name)
+                    elif group == 'sm-field':
+                        field_name = result.get('sm-field', '')
+                        if field_name and field_name != 'Nan' and query.lower() in field_name.lower():
+                            group_options.append(field_name)
+                    elif group == 'inst_name':
+                        inst_name = result.get('inst_name', '')
+                        if inst_name and inst_name != 'Nan' and query.lower() in inst_name.lower():
+                            group_options.append(inst_name)
+                
+                group_selection.options = group_options[:50]  # Limiter à 50 résultats
+                group_status.value = f'<i>✓ {len(group_options)} groups found</i>'
+                
+            except Exception as e:
+                group_status.value = f'<i style="color:red">Error loading groups: {str(e)}</i>'
+        
+        def update_group_type(change):
+            group_selection.value = ''
+            group_selection.options = []
+            group_selection.placeholder = f'Select {group_type.value}...'
+        
+        author_search.observe(update_author_suggestions, names='value')
+        group_selection.observe(update_group_suggestions, names='value')
+        group_type.observe(update_group_type, names='value')
+        
+        # ==========================================================================================
+        # FONCTION PRINCIPALE DE COMPARAISON
+        # ==========================================================================================
+        
+        def create_comparison_figures(author_name, career_author, year_author, group_type, group_name, exclude_self, log_transform):
+            """Crée les figures de comparaison auteur vs groupe."""
             
-    #         print(f"✅ Données préparées pour {len(data_list)} pays")
-    #         return pd.DataFrame(data_list)
+            try:
+                # Récupérer les données de l'auteur
+                prefix_author = 'career' if career_author else 'singleyr'
+                author_data = self.get_author_data(author_name, prefix_author)
+                
+                if not author_data:
+                    return None, None, None, None
+                    
+                key_author = f"{prefix_author}_{year_author}"
+                if key_author not in author_data:
+                    return None, None, None, None
+                    
+                author_metrics = author_data[key_author]
+                
+                # Récupérer les données du groupe via API aggregate
+                if group_type == 'cntry':
+                    api_type = 'country'
+                    # Convertir le nom du pays en code
+                    try:
+                        country_code = coco.convert(names=group_name, to='ISO2')
+                        group_value = country_code.lower()
+                    except:
+                        group_value = group_name.lower()
+                elif group_type == 'sm-field':
+                    api_type = 'field'
+                    group_value = group_name
+                else:  # 'inst_name'
+                    api_type = 'institution' 
+                    group_value = group_name
+                
+                group_data = self.get_es_aggregate(group_type, group_value, prefix_author)
+                
+                if not group_data:
+                    return None, None, None, None
+                    
+                # Informations pour les cartes
+                suffix = ' (ns)' if exclude_self else ''
+                
+                # Carte Auteur
+                author_rank = author_metrics.get(f'rank{suffix}', 'N/A')
+                author_self_cit = round(author_metrics.get('self%', 0) * 100, 2)
+                author_country = author_metrics.get('cntry', 'N/A')
+                author_field = author_metrics.get('sm-field', 'N/A')
+                author_institute = author_metrics.get('inst_name', 'N/A')
+                
+                # Carte Groupe
+                group_self_cit = round(group_data[f'{prefix_author}_{year_author}']['self%'][2] * 100, 2)
+                group_size = group_data[f'{prefix_author}_{year_author}'].get('c', [0,0,0,0,0])[4]  # Utiliser le count comme proxy
+                
+                # Créer les 7 figures (6 métriques + score C)
+                metrics_base = ['nc', 'h', 'hm', 'ncs', 'ncsf', 'ncsfl', 'c']
+                metrics_with_suffix = [f'{m}{suffix}' for m in metrics_base]
+                
+                metric_titles = [
+                    'Number of citations<br>(NC)', 
+                    'H-index<br>(H)', 
+                    'Hm-index<br>(Hm)', 
+                    'Number of citations to<br>single authored papers<br>(NCS)', 
+                    'Number of citations to<br>single and first<br>authored papers<br>(NCSF)', 
+                    'Number of citations to<br>single, first and<br>last authored papers<br>(NCSFL)', 
+                    'Composite score (C)'
+                ]
+                
+                fig_list = []
+                
+                for i, metric in enumerate(metrics_with_suffix):
+                    base_metric = metrics_base[i]
+                    
+                    # Valeur de l'auteur
+                    author_value = author_metrics.get(metric, 0)
+                    
+                    # Données du groupe (box plot)
+                    group_stats = group_data[f'{prefix_author}_{year_author}'][base_metric]
+                    
+                    # Créer la figure
+                    fig = go.Figure()
+                    
+                    # Box plot du groupe
+                    fig.add_trace(go.Box(
+                        y=[group_stats],  # [min, q1, median, q3, max]
+                        name=group_name,
+                        marker_color=self.highlight2,
+                        boxpoints=False,
+                        whiskerwidth=0.2,
+                        fillcolor='rgba(173, 216, 230, 0.5)',
+                        line=dict(color=self.highlight2)
+                    ))
+                    
+                    # Ligne pour la valeur de l'auteur
+                    fig.add_hline(
+                        y=author_value,
+                        line_dash="dash",
+                        line_color=self.highlight1,
+                        line_width=3,
+                        annotation_text=f"Author: {author_value:.1f}",
+                        annotation_font_color=self.highlight1,
+                        annotation_position="top left"
+                    )
+                    
+                    # Mise en forme
+                    fig.update_layout(
+                        height=250,
+                        title={
+                            'text': metric_titles[i],
+                            'font': {'size': 14, 'color': self.lightAccent1},
+                            'x': 0.5
+                        },
+                        plot_bgcolor=self.bgc,
+                        paper_bgcolor=self.bgc,
+                        font={'color': self.lightAccent1},
+                        showlegend=False,
+                        margin={'l': 40, 'r': 20, 't': 60, 'b': 40}
+                    )
+                    
+                    fig.update_xaxes(showticklabels=False)
+                    fig.update_yaxes(showgrid=True, gridcolor=self.darkAccent2)
+                    
+                    fig_list.append(fig)
+                
+                return fig_list, author_rank, group_size, {
+                    'author': {
+                        'name': author_name,
+                        'rank': author_rank,
+                        'self_cit': author_self_cit,
+                        'country': author_country,
+                        'field': author_field,
+                        'institute': author_institute
+                    },
+                    'group': {
+                        'name': group_name,
+                        'type': group_type,
+                        'self_cit': group_self_cit,
+                        'size': group_size
+                    }
+                }
+                
+            except Exception as e:
+                print(f"Error creating figures: {e}")
+                return None, None, None, None
+        
+        def update_comparison(b=None):
+            with info_output:
+                clear_output(wait=True)
+            with figures_output:
+                clear_output(wait=True)
+            with c_score_output:
+                clear_output(wait=True)
+                
+            author_name = author_search.value
+            career_author = career_single_author.value == 'Career'
+            year_author_val = year_author.value
+            group_type_val = group_type.value
+            group_name_val = group_selection.value
+            exclude_self_val = exclude_self.value
+            log_transform_val = log_transform.value
             
-    #     except Exception as e:
-    #         print(f"❌ Error in get_world_data: {e}")
-    #         import traceback
-    #         traceback.print_exc()
-    #         return pd.DataFrame()
-   
-    def _extract_statistic(self, metric_value, stat_idx: int) -> float:
-        """
-        Extrait la valeur statistique d'une métrique.
-        """
-        if isinstance(metric_value, list) and len(metric_value) > stat_idx:
-            return float(metric_value[stat_idx])
-        elif isinstance(metric_value, (int, float)):
-            return float(metric_value)
-        else:
-            return 0.0
+            if not author_name or not group_name_val:
+                with info_output:
+                    print("❌ Please select both an author and a group")
+                return
+            
+            try:
+                with info_output:
+                    print("🔄 Generating comparison...")
+                
+                # Créer les figures
+                fig_list, author_rank, group_size, info_dict = create_comparison_figures(
+                    author_name, career_author, year_author_val, group_type_val, 
+                    group_name_val, exclude_self_val, log_transform_val
+                )
+                
+                if not fig_list:
+                    with info_output:
+                        print("❌ No data available for the selected combination")
+                    return
+                
+                # Afficher les cartes d'information
+                with info_output:
+                    clear_output(wait=True)
+                    
+                    # HTML pour les cartes
+                    author_html = f"""
+                    <div style="display: flex; justify-content: space-between; padding: 10px;">
+                        <div style="background-color: {self.highlight1}; padding: 15px; border-radius: 8px; width: 48%;">
+                            <h4 style="color: {self.darkAccent1}; margin: 0 0 10px 0;">Author: {info_dict['author']['name']}</h4>
+                            <p style="color: {self.darkAccent1}; margin: 5px 0;">
+                                <strong>Rank:</strong> {info_dict['author']['rank']}<br>
+                                <strong>Country:</strong> {info_dict['author']['country']}<br>
+                                <strong>Field:</strong> {info_dict['author']['field']}<br>
+                                <strong>Institute:</strong> {info_dict['author']['institute']}<br>
+                                <strong>Self-citation:</strong> {info_dict['author']['self_cit']}%
+                            </p>
+                        </div>
+                        <div style="background-color: {self.highlight2}; padding: 15px; border-radius: 8px; width: 48%;">
+                            <h4 style="color: {self.darkAccent1}; margin: 0 0 10px 0;">Group: {info_dict['group']['name']}</h4>
+                            <p style="color: {self.darkAccent1}; margin: 5px 0;">
+                                <strong>Type:</strong> {info_dict['group']['type']}<br>
+                                <strong>Group size:</strong> {info_dict['group']['size']} authors<br>
+                                <strong>Median self-citation:</strong> {info_dict['group']['self_cit']}%
+                            </p>
+                        </div>
+                    </div>
+                    """
+                    display(HTML(author_html))
+                
+                # Afficher les 6 premières métriques
+                with figures_output:
+                    clear_output(wait=True)
+                    
+                    # Créer un layout en grille 2x3 pour les 6 premières métriques
+                    from IPython.display import display, HTML
+                    
+                    # Afficher les figures côte à côte
+                    fig_html = ""
+                    for i in range(6):
+                        fig_html += f"""
+                        <div style="display: inline-block; width: 33%; padding: 5px;">
+                            {fig_list[i].to_html(include_plotlyjs='cdn' if i == 0 else False, div_id=f"plot{i}")}
+                        </div>
+                        """
+                        if (i + 1) % 3 == 0:  # Nouvelle ligne après 3 figures
+                            fig_html += "<div style='clear: both;'></div>"
+                    
+                    display(HTML(fig_html))
+                
+                # Afficher le score C et la formule
+                with c_score_output:
+                    clear_output(wait=True)
+                    
+                    # Figure du score C
+                    display(fig_list[6])
+                    
+                    # Formule du score C
+                    formula_html = f"""
+                    <div style="background-color: {self.darkAccent1}; padding: 20px; border-radius: 10px; margin-top: 20px; text-align: center;">
+                        <div style="color: {self.lightAccent1}; font-size: 16px; margin-bottom: 10px;">
+                            <strong>Composite Score Formula</strong>
+                        </div>
+                        <div style="color: {self.lightAccent1}; font-size: 18px; font-family: 'Courier New', monospace;">
+                            c = (6×nc + 6×h + 5×h<sub>m</sub> + 4×nc<sub>s</sub> + 3×nc<sub>sf</sub> + 2×nc<sub>sfl</sub>) / 26
+                        </div>
+                        <div style="color: {self.darkAccent3}; font-size: 14px; margin-top: 10px;">
+                            Author rank: <strong>{author_rank}</strong> | Group size: <strong>{group_size}</strong> authors
+                        </div>
+                    </div>
+                    """
+                    display(HTML(formula_html))
+                    
+            except Exception as e:
+                with info_output:
+                    print(f"❌ Error generating comparison: {str(e)}")
+                import traceback
+                traceback.print_exc()
+        
+        update_button.on_click(update_comparison)
+        
+        # ==========================================================================================
+        # LAYOUT FINAL
+        # ==========================================================================================
+        
+        # Contrôles Auteur
+        author_controls = widgets.VBox([
+            widgets.HBox([author_search, search_status]),
+            widgets.HBox([career_single_author, year_author])
+        ], layout=widgets.Layout(border='1px solid gray', padding='10px'))
+        
+        # Contrôles Groupe
+        group_controls = widgets.VBox([
+            widgets.HBox([group_type]),
+            widgets.HBox([group_selection, group_status])
+        ], layout=widgets.Layout(border='1px solid gray', padding='10px'))
+        
+        # Options globales
+        global_controls = widgets.HBox([
+            exclude_self,
+            log_transform,
+            update_button
+        ], layout=widgets.Layout(border='1px solid gray', padding='10px', justify_content='space-between'))
+        
+        # Layout principal
+        main_layout = widgets.VBox([
+            widgets.HTML("<h2 style='color: #ECAB4C;'>Author vs Group Comparison</h2>"),
+            widgets.HBox([author_controls, group_controls]),
+            global_controls,
+            widgets.HTML("<h3 style='color: #ECAB4C;'>Information Cards</h3>"),
+            info_output,
+            widgets.HTML("<h3 style='color: #ECAB4C;'>Performance Metrics Comparison</h3>"),
+            figures_output,
+            widgets.HTML("<h3 style='color: #ECAB4C;'>Composite Score & Formula</h3>"),
+            c_score_output
+        ])
+        
+        # Affichage
+        display(main_layout)
+        
+        # Initialiser les suggestions de groupe
+        update_group_type(None)
+    
+    #group_vs_group_layout
+    def interactive_group_vs_group_comparison(self):
+        return 
+    
+    # ========================================================================
+    # VISUALISATION - MAPS
+    # ========================================================================
 
-    def plot_world_map(self, year: str = "2021", metric: str = "h", 
-                  career_type: str = "career", statistic: str = "median") -> go.Figure:
+    def get_country_aggregates(self, year: str = "2021", career: bool = True) -> Optional[pd.DataFrame]:
         """
-        Crée une carte choroplèthe mondiale identique au dashboard.
+        Récupère les données agrégées par pays via l'API.
         
         Args:
             year: Année (2017-2021)
-            metric: Métrique ("h", "nc", "hm", etc.)
-            career_type: "career" ou "singleyr" 
-            statistic: "min", "25", "median", "75", "max"
+            career: True pour career, False pour singleyr
             
         Returns:
-            Figure Plotly avec carte choroplèthe
-        """
-        # Récupérer les données
-        df = self.get_world_map_data(year, metric, career_type, statistic)
-        
-        if df.empty:
-            print("❌ Aucune donnée disponible pour la carte")
-            return go.Figure()
-        
-        # Titre de la carte
-        metric_name = self._get_metric_long_name(career_type == "career", metric)
-        title = f"{metric_name} par pays ({year}) - {statistic}"
-        
-        # Créer la carte choroplèthe
-        fig = px.choropleth(
-            df,
-            locations='code',
-            color='value',
-            hover_name='country',
-            hover_data={
-                'value': ':.2f',
-                'metric': True,
-                'code': False
-            },
-            color_continuous_scale="viridis",
-            title=title,
-            labels={'value': f'{metric} ({statistic})'}
-        )
-        
-        # Appliquer le style du dashboard
-        fig.update_layout(
-            geo=dict(
-                bgcolor=self.bgc,
-                showframe=False,
-                showcoastlines=True,
-                projection_type='equirectangular'
-            ),
-            plot_bgcolor=self.bgc,
-            paper_bgcolor=self.bgc,
-            font=dict(color=self.lightAccent1, size=12),
-            height=600,
-            margin={"r":0,"t":50,"l":0,"b":0},
-            coloraxis_colorbar=dict(
-                thickness=20,
-                tickfont=dict(color=self.lightAccent1),
-                title_font=dict(color=self.lightAccent1)
-            )
-        )
-        
-        return fig
-
-    # def plot_world_map(self, year: str = "2021", metric: str = "h", 
-    #                   career_type: str = "career", statistic: str = "median") -> go.Figure:
-    #     """
-    #     Crée une carte mondiale identique à celle du dashboard
-        
-    #     Args:
-    #         year: Année (2017-2021)
-    #         metric: Métrique ("h", "nc", "hm", etc.)
-    #         career_type: "career" ou "singleyr" 
-    #         statistic: "min", "25", "median", "75", "max"
-            
-    #     Returns:
-    #         Figure Plotly avec carte choroplèthe
-    #     """
-    #     # Récupérer les données
-    #     df = self.get_world_data(year, metric, career_type, statistic)
-        
-    #     if df.empty:
-    #         print("❌ No data available for world map")
-    #         return go.Figure()
-        
-    #     # Couleurs du dashboard
-    #     darkAccent1 = '#2C2C2C'  # dark gray
-    #     lightAccent1 = '#ECAB4C' # ocre
-        
-    #     # Créer la carte choroplèthe
-    #     fig = px.choropleth(
-    #         data_frame=df,
-    #         locations='code',
-    #         color=statistic,
-    #         color_continuous_scale="viridis",
-    #         hover_name='country',
-    #         hover_data=['metric_name', 'metric'],
-    #         title=f'{metric} by country ({year}) - {career_type}'
-    #     )
-        
-    #     # Appliquer le style identique au dashboard
-    #     fig.update_layout(
-    #         autosize=True,
-    #         height=700,
-    #         coloraxis_colorbar_thickness=23,
-    #         coloraxis_colorbar_tickfont=dict(color='white'),
-    #         coloraxis_colorbar_title=dict(font={"color": 'white'}),
-    #         coloraxis_colorbar_orientation="h",
-    #         coloraxis_colorbar_y=-0.1,
-    #         plot_bgcolor=darkAccent1,
-    #         paper_bgcolor=darkAccent1,
-    #         font_color='white',
-    #         geo_bgcolor=darkAccent1,
-    #         margin={'l': 0, 'r': 0, 'b': 0, 't': 50}
-    #     )
-        
-    #     fig.update_geos(
-    #         projection=dict(scale=1), 
-    #         center=dict(lat=30), 
-    #         showframe=False
-    #     )
-        
-    #     return fig
-
-    def plot_interactive_world_map(self, year: str = "2021", metric: str = "h", 
-                                 career_type: str = "career", statistic: str = "median"):
-        """
-        Version interactive avec animation entre les métriques
-        Similaire à la carte avec slider dans home.py
-        """
-        # Métriques disponibles pour l'animation
-        metrics = ['h', 'nc', 'hm', 'ncs', 'ncsf', 'ncsfl', 'c']
-        metrics_name = ['H-index', '# citations', 'Hm-index', 
-                       '# citations to single auth papers', 
-                       '# citations to single/first auth papers', 
-                       '# citations to single/first/last auth papers', 
-                       'Composite (c) score']
-        
-        # Récupérer les données pour toutes les métriques
-        all_data = []
-        for m in metrics:
-            df = self.get_world_data(year, m, career_type, statistic)
-            if not df.empty:
-                all_data.append(df)
-        
-        if not all_data:
-            print("❌ No data available for interactive map")
-            return go.Figure()
-        
-        # Combiner toutes les données
-        combined_df = pd.concat(all_data, ignore_index=True)
-        
-        # Couleurs du dashboard
-        darkAccent1 = '#2C2C2C'
-        lightAccent1 = '#ECAB4C'
-        
-        # Créer la carte avec animation
-        fig = px.choropleth(
-            data_frame=combined_df,
-            locations='code',
-            color=statistic,
-            color_continuous_scale="viridis",
-            animation_frame='metric',
-            hover_name='country',
-            hover_data=['metric_name', 'metric'],
-            title=f'World Distribution - {career_type} data up to {year}'
-        )
-        
-        # Style identique au dashboard
-        fig.update_layout(
-            height=700,
-            autosize=True,
-            coloraxis_colorbar_thickness=23,
-            coloraxis_colorbar_tickfont=dict(color='white'),
-            coloraxis_colorbar_orientation="h",
-            coloraxis_colorbar_y=-0.1,
-            coloraxis_colorbar_title=dict(font={"color": 'white'}),
-            plot_bgcolor=darkAccent1,
-            paper_bgcolor=darkAccent1
-        )
-        
-        fig.update_layout(
-            sliders=[dict(
-                font={'color': 'white'},
-                bgcolor=lightAccent1,
-                steps=[
-                    {'label': 'H-index'}, 
-                    {'label': '#cites'}, 
-                    {'label': 'Hm-index'}, 
-                    {'label': '#pprs-s'}, 
-                    {'label': '#pprs-sf'},
-                    {'label': '#pprs-sfl'},
-                    {'label': 'C'}
-                ]
-            )],
-            updatemenus=[dict(bgcolor=lightAccent1)]
-        )
-        
-        fig.update_layout(
-            geo_bgcolor=darkAccent1,
-            margin={'l': 0, 'r': 0, 'b': 0, 't': 0}
-        )
-        
-        fig.update_geos(
-            projection=dict(scale=1), 
-            center=dict(lat=30), 
-            showframe=False
-        )
-        
-        return fig
-
-    def get_country_details(self, country_code: str, year: str = "2021", 
-                        career_type: str = "career") -> Dict[str, Any]:
-        """
-        Récupère les détails d'un pays à partir des données agrégées.
-        
-        Args:
-            country_code: Code du pays (ex: "fr", "us")
-            year: Année (2021)
-            career_type: "career" ou "singleyr"
-            
-        Returns:
-            Dictionnaire avec les données du pays
+            DataFrame avec les statistiques par pays ou None
         """
         try:
-            # Récupérer les données agrégées par pays
-            aggregate_data = self.get_aggregate_data("country", 
-                                                year=year if career_type == "singleyr" else None)
+            url = f"{self.base_url}/aggregate/country"
+            params = {'limit': 500}
             
-            if not aggregate_data:
+            if not career:
+                params['year'] = year
+            
+            response = self.session.get(url, params=params)
+            response.raise_for_status()
+            
+            data = response.json()
+            results = data.get('results', [])
+            
+            if not results:
                 print("❌ Aucune donnée agrégée trouvée")
-                return {}
+                return None
             
-            # Chercher le pays spécifique
-            for country_data in aggregate_data:
-                if country_data.get('cntry', '').lower() == country_code.lower():
-                    print(f"✅ Pays {country_code.upper()} trouvé")
-                    
-                    # La clé pour les données de l'année
-                    year_key = f"{career_type}_{year}"
-                    
-                    # Essayer différentes structures de données possibles
-                    result = {
-                        'country_code': country_code.upper(),
-                        'year': year,
-                        'career_type': career_type,
-                        'year_key': year_key
-                    }
-                    
-                    # 1. Chercher directement dans l'objet country_data
-                    if year_key in country_data:
-                        result['data'] = country_data[year_key]
-                        result['source'] = 'direct'
-                        return result
-                    
-                    # 2. Chercher dans le champ 'data' si présent
-                    elif 'data' in country_data and year_key in country_data['data']:
-                        result['data'] = country_data['data'][year_key]
-                        result['source'] = 'nested_data'
-                        return result
-                    
-                    # 3. Chercher toutes les clés qui contiennent l'année
-                    else:
-                        # Lister toutes les clés disponibles
-                        all_keys = list(country_data.keys())
-                        if 'data' in country_data and isinstance(country_data['data'], dict):
-                            all_keys.extend(country_data['data'].keys())
-                        
-                        year_keys = [k for k in all_keys if year in k]
-                        result['available_keys'] = year_keys
-                        result['all_keys'] = all_keys
-                        result['source'] = 'keys_listed'
-                        
-                        print(f"⚠️  Clé {year_key} non trouvée. Clés disponibles: {year_keys}")
-                        return result
+            # Préparer les données pour chaque pays
+            country_data = []
+            prefix = 'career' if career else 'singleyr'
             
-            print(f"❌ Pays {country_code} non trouvé dans les données agrégées")
-            return {}
-            
-        except Exception as e:
-            print(f"❌ Erreur lors de la récupération des données du pays: {e}")
-            return {}
-   
-    def create_world_map_interface(self):
-        """
-        Crée une interface interactive pour la carte mondiale
-        """
-            
-        # Widgets de contrôle
-        year_widget = widgets.Dropdown(
-            options=['2017', '2018', '2019', '2020', '2021'],
-            value='2021',
-            description='Year:'
-        )
-        
-        metric_widget = widgets.Dropdown(
-            options=['h', 'nc', 'hm', 'ncs', 'ncsf', 'ncsfl', 'c'],
-            value='h',
-            description='Metric:'
-        )
-        
-        career_widget = widgets.Dropdown(
-            options=['career', 'singleyr'],
-            value='career',
-            description='Data Type:'
-        )
-        
-        stat_widget = widgets.Dropdown(
-            options=['min', '25', 'median', '75', 'max'],
-            value='median',
-            description='Statistic:'
-        )
-        
-        update_btn = widgets.Button(description='🔄 Update Map', button_style='success')
-        output = widgets.Output()
-        
-        def update_map(btn=None):
-            with output:
-                output.clear_output(wait=True)
-                print("🔄 Loading world map data...")
+            for result in results:
+                country_code = result.get('cntry', '').lower()
+                if not country_code or country_code in ['csk', 'nan']:
+                    continue
                 
-                fig = self.plot_world_map(
-                    year=year_widget.value,
-                    metric=metric_widget.value,
-                    career_type=career_widget.value,
-                    statistic=stat_widget.value
-                )
-                
-                if fig:
-                    fig.show()
+                # Convertir le code pays en nom
+                if country_code == 'sux':
+                    country_name = 'Russia'
+                elif country_code == 'ant':
+                    country_name = 'Netherlands'
+                elif country_code == 'scg':
+                    country_name = 'Czech Republic'
                 else:
-                    print("❌ Failed to generate map")
+                    country_name = coco.convert(country_code, to='name_short')
+                
+                # Décompresser les données
+                agg_data = result.get('data')
+                if isinstance(agg_data, str):
+                    try:
+                        agg_data = self.base64_decode_and_decompress(agg_data)
+                    except Exception as e:
+                        print(f" Erreur décompression pour {country_code}: {e}")
+                        continue
+                
+                # Extraire les statistiques pour l'année
+                year_key = f'{prefix}_{year}'
+                if year_key not in agg_data:
+                    continue
+                
+                year_data = agg_data[year_key]
+                
+                country_data.append({
+                    'CODE': country_code,
+                    'COUNTRY': country_name,
+                    'data': year_data
+                })
+            
+            if not country_data:
+                print("❌ Aucune donnée valide après traitement")
+                return None
+            
+            return pd.DataFrame(country_data)
         
-        update_btn.on_click(update_map)
-        
-        # Interface
-        controls = widgets.HBox([year_widget, metric_widget, career_widget, stat_widget, update_btn])
-        interface = widgets.VBox([
-            widgets.HTML("<h2>🌍 Twopercenters World Map</h2>"),
-            controls,
-            output
-        ])
-        
-        # Premier affichage
-        update_map()
-        
-        return interface
-    
-    def get_author_info(self, author_name: str, index: str = "career") -> Dict[str, Any]: 
+        except Exception as e:
+            print(f"❌ Erreur récupération agrégats pays: {e}")
+            import traceback
+            traceback.print_exc()
+            return None
+
+    def create_choropleth_map(self, metric: str = 'nc', statistic: str = 'median',
+                            year: str = "2021", career: bool = True,
+                            exclude_self_citations: bool = False) -> Optional[go.Figure]:
         """
-        Récupère les informations de base d'un auteur.
+        Crée une carte choroplèthe mondiale pour une métrique donnée.
         
         Args:
-            author_name: Nom de l'auteur
-            index: "career" ou "singleyr"
+            metric: Métrique de base ('nc', 'h', 'hm', 'ncs', 'ncsf', 'ncsfl', 'c')
+            statistic: Statistique à afficher ('count', 'median', 'min', 'max', '25%', '75%')
+            year: Année (2017-2021)
+            career: True pour career-long, False pour single-year
+            exclude_self_citations: Exclure les auto-citations
             
         Returns:
-            Dictionnaire avec informations (institution, pays, domaine, etc.)
+            Figure Plotly ou None
         """
-        results = self.search_authors(author_name, index=index, field="authfull", limit=1)
-        
-        if not results:
-            return {}
-        
-        result = results[0]
-        data = result.get("data", {})
-        
-        # Extraire la dernière année disponible
-        years = [k.split('_')[1] for k in data.keys() if not k.endswith('_log')]
-        if years:
-            latest_year = max(years)
-            latest_data = data.get(f"{index}_{latest_year}", {})
+        try:
+            # Récupérer les données agrégées
+            df = self.get_country_aggregates(year, career)
             
-            return {
-                "author": author_name,
-                "institution": latest_data.get("inst_name", "N/A"),
-                "country": latest_data.get("cntry", "N/A"),
-                "field": latest_data.get("sm-field", "N/A"),
-                "self_citation_pct": round(latest_data.get("self%", 0) * 100, 2),
-                "rank": latest_data.get("rank", "N/A"),
-                "h_index": latest_data.get("h", "N/A"),
-                "total_citations": latest_data.get("nc", "N/A"),
-                "latest_year": latest_year
-            }
-        
-        return {}
-
-
-
-
-#==============================================================================
- #                                 Anciens tests
-#==============================================================================
-  
-   
-    # def plot_author_metrics_gauge(self, author_name: str, year: str = "2021",
-    #                               career: bool = True, exclude_self_citations: bool = False,
-    #                               comparison_group: str = "country") -> go.Figure:
-    #     """
-    #     Crée des jauges comparant les métriques d'un auteur aux médianes/max du groupe.
-    #     Reproduit la visualisation du dashboard (author_find.py).
-        
-    #     Args:
-    #         author_name: Nom de l'auteur
-    #         year: Année à afficher
-    #         career: True pour career, False pour single year
-    #         exclude_self_citations: Exclure les auto-citations
-    #         comparison_group: "country", "field", ou "institution"
+            if df is None or df.empty:
+                print("❌ Pas de données disponibles")
+                return None
             
-    #     Returns:
-    #         Figure Plotly avec gauges
+            # Ajouter le suffixe pour auto-citations si nécessaire
+            metric_key = metric if not exclude_self_citations else metric
+            
+            # Extraire les statistiques pour la métrique
+            stat_values = []
+            valid_countries = []
+            
+            for idx, row in df.iterrows():
+                year_data = row['data']
+                
+                if metric_key not in year_data:
+                    continue
+                
+                metric_data = year_data[metric_key]
+                
+                # Structure: [min, q1, median, q3, max]
+                if not isinstance(metric_data, list) or len(metric_data) < 5:
+                    continue
+                
+                # Mapper la statistique demandée
+                if statistic == 'count':
+                    # Pour count, on compte le nombre d'auteurs (pas directement disponible)
+                    # On utilisera la médiane comme proxy
+                    value = metric_data[2]
+                elif statistic == 'min':
+                    value = metric_data[0]
+                elif statistic == '25%':
+                    value = metric_data[1]
+                elif statistic == 'median':
+                    value = metric_data[2]
+                elif statistic == '75%':
+                    value = metric_data[3]
+                elif statistic == 'max':
+                    value = metric_data[4]
+                else:
+                    value = metric_data[2]  # Défaut: médiane
+                
+                stat_values.append(value)
+                valid_countries.append(row['CODE'])
+            
+            if not stat_values:
+                print("❌ Aucune statistique valide extraite")
+                return None
+            
+            # Créer le DataFrame pour la carte avec les noms de pays
+            country_names = []
+            for code in valid_countries:
+                if code == 'sux':
+                    country_names.append('Russia')
+                elif code == 'ant':
+                    country_names.append('Netherlands')
+                elif code == 'scg':
+                    country_names.append('Czech Republic')
+                else:
+                    country_names.append(coco.convert(code, to='name_short'))
+            
+            map_df = pd.DataFrame({
+                'CODE': [c.upper() for c in valid_countries],  # Convertir en majuscules
+                'COUNTRY': country_names,
+                'value': stat_values
+            })
+            
+            # Mise en forme
+            prefix_text = 'Career-long' if career else 'Single-year'
+            metric_name = self._get_metric_long_name(career, metric, 0, False)
+
+            # Ajouter les métadonnées au DataFrame
+            map_df['metric'] = metric
+            map_df['metric_name'] = metric_name
+
+            # Créer la carte avec plotly graph_objects pour plus de contrôle
+            fig = go.Figure(data=go.Choropleth(
+                locations=map_df['CODE'],
+                locationmode='ISO-3',
+                z=map_df['value'],
+                text=map_df['COUNTRY'],
+                colorscale='Viridis',
+                customdata=map_df[['metric', 'metric_name']],
+                autocolorscale=False,
+                reversescale=False,
+                marker_line_color=self.darkAccent3,
+                marker_line_width=0.5,
+                colorbar=dict(
+                    title=dict(
+                        text=statistic.title(),
+                        font=dict(color=self.lightAccent1)
+                    ),
+                    tickfont=dict(color=self.lightAccent1),
+                    thickness=15,
+                    len=0.7
+                ),
+                hovertemplate='<b>%{text}</b><br>' 'metric=%{customdata[0]}<br>' +
+                            'code=%{location}<br>' +
+                            'country=%{text}<br>' +
+                            'metric_name=%{customdata[1]}<br>' +
+                            f'{statistic.title()}: %{{z:.2f}}<br>' +
+                            '<extra></extra>'
+            ))
+            
+            
+            
+            fig.update_geos(
+                showcountries=True,
+                countrycolor=self.darkAccent3,
+                showcoastlines=True,
+                coastlinecolor=self.darkAccent3,
+                projection_type='natural earth',
+                bgcolor=self.bgc
+            )
+            
+            fig.update_layout(
+                # title={
+                #     'text': f"{prefix_text} {metric_name} - {statistic.title()} by Country ({year})",
+                #     'font': {'size': 18, 'color': self.lightAccent1},
+                #     'x': 0.5
+                # },
+                geo=dict(bgcolor=self.bgc),
+                plot_bgcolor=self.bgc,
+                paper_bgcolor=self.bgc,
+                font=dict(color=self.lightAccent1),
+                height=600,
+                coloraxis_colorbar=dict(
+                    title=dict(
+                        text=statistic.title(),
+                        font=dict(color=self.lightAccent1)
+                    ),
+                    tickfont=dict(color=self.lightAccent1)
+                )
+            )
+            
+            return fig
+        
+        except Exception as e:
+            print(f"❌ Erreur création carte: {e}")
+            import traceback
+            traceback.print_exc()
+            return None
+
+    def interactive_choropleth_map(self):
+        """
+        Interface interactive pour explorer les cartes choroplèthes par pays.
+        Reproduit l'interface du dashboard serveur pour les geo maps.
+        """
+        # ==========================================================================================
+        # WIDGETS DE CONTRÔLE
+        # ==========================================================================================
+        
+        # Type de données
+        dataset_type = widgets.Dropdown(
+            options=['Career', 'Single Year'],
+            value='Career',
+            description='Dataset:',
+            style={'description_width': '100px'},
+            layout=widgets.Layout(width='250px')
+        )
+        
+        # Année
+        year_selector = widgets.Dropdown(
+            options=['2017', '2018', '2019', '2020', '2021'],
+            value='2021',
+            description='Year:',
+            style={'description_width': '100px'},
+            layout=widgets.Layout(width='200px')
+        )
+        
+        # Métrique
+        metric_selector = widgets.Dropdown(
+            options=[
+                ('Number of Citations', 'nc'),
+                ('H-index', 'h'),
+                ('Hm-index', 'hm'),
+                ('Cit. Single Authored', 'ncs'),
+                ('Cit. Single+First', 'ncsf'),
+                ('Cit. Single+First+Last', 'ncsfl'),
+                ('Composite Score', 'c')
+            ],
+            value='h',
+            description='Metric:',
+            style={'description_width': '100px'},
+            layout=widgets.Layout(width='300px')
+        )
+        
+        # Statistique
+        statistic_selector = widgets.Dropdown(
+            options=[
+                ('Count', 'count'),
+                ('Median', 'median'),
+                ('Minimum', 'min'),
+                ('Maximum', 'max'),
+                ('25th Percentile', '25%'),
+                ('75th Percentile', '75%')
+            ],
+            value='median',
+            description='Statistic:',
+            style={'description_width': '100px'},
+            layout=widgets.Layout(width='250px')
+        )
+        
+        # Options
+        exclude_self = widgets.Checkbox(
+            value=False,
+            description='Exclude self-citations',
+            style={'description_width': '100px'}
+        )
+        
+        # Bouton de mise à jour
+        update_button = widgets.Button(
+            description='Generate Map',
+            button_style='success',
+            icon='globe',
+            layout=widgets.Layout(width='200px')
+        )
+        
+        # Sortie
+        output = widgets.Output()
+        
+        # ==========================================================================================
+        # FONCTION DE MISE À JOUR
+        # ==========================================================================================
+        
+        def update_map(b=None):
+            with output:
+                clear_output(wait=True)
+                
+                career = dataset_type.value == 'Career'
+                year = year_selector.value
+                metric = metric_selector.value
+                statistic = statistic_selector.value
+                exclude = exclude_self.value
+                
+                print(f" Generating map for {metric} ({statistic})...")
+                
+                try:
+                    fig = self.create_choropleth_map(
+                        metric=metric,
+                        statistic=statistic,
+                        year=year,
+                        career=career,
+                        exclude_self_citations=exclude
+                    )
+                    
+                    if fig:
+                        fig.show()
+                        
+                    else:
+                        print("❌ Unable to generate map")
+                
+                except Exception as e:
+                    print(f"❌ Error: {str(e)}")
+                    import traceback
+                    traceback.print_exc()
+        
+        update_button.on_click(update_map)
+        
+        # ==========================================================================================
+        # LAYOUT FINAL
+        # ==========================================================================================
+        
+        controls = widgets.VBox([
+            widgets.HBox([dataset_type, year_selector, metric_selector, statistic_selector]),
+            widgets.HBox([exclude_self, update_button]),
+            #widgets.HBox([])
+        ])
+        
+        display(controls)
+        display(output)
+        
+        # Génération initiale
+        update_map()
+
+
+# ========================================================================
+# Anciens tests
+# ========================================================================
+
+
+        # def create_comparison_figures(author1, career1, year1, author2, career2, year2, exclude_self, log_transform):
+        #     """Crée une seule figure avec le layout spécifié."""
+            
+        #     # Récupérer les données
+        #     prefix1 = 'career' if career1 else 'singleyr'
+        #     prefix2 = 'career' if career2 else 'singleyr'
+            
+        #     data1 = self.get_author_data(author1, prefix1)
+        #     data2 = self.get_author_data(author2, prefix2)
+            
+        #     if not data1 or not data2:
+        #         return None
+            
+        #     # Extraire les données de l'année
+        #     key1 = f"{prefix1}_{year1}"
+        #     key2 = f"{prefix2}_{year2}"
+            
+        #     if key1 not in data1 or key2 not in data2:
+        #         return None
+            
+        #     metrics1 = data1[key1]
+        #     metrics2 = data2[key2]
+            
+        #     # Définir les métriques
+        #     suffix = ' (ns)' if exclude_self else ''
+        #     metrics_list = ['nc', 'h', 'hm', 'ncs', 'ncsf', 'ncsfl', 'c']
+        #     metrics_with_suffix = [f'{m}{suffix}' for m in metrics_list]
+            
+        #     # Récupérer les valeurs
+        #     values1 = [metrics1.get(m, 0) for m in metrics_with_suffix]
+        #     values2 = [metrics2.get(m, 0) for m in metrics_with_suffix]
+            
+        #     # Rangs
+        #     rank1 = metrics1.get(f'rank{suffix}', 'N/A')
+        #     rank2 = metrics2.get(f'rank{suffix}', 'N/A')
+            
+        #     # Créer UNE SEULE grande figure avec 2 lignes et 7 colonnes
+        #     fig = make_subplots(
+        #         rows=2, cols=7,
+        #         specs=[
+        #             # Ligne 1: Score C (1,1) + Rank A1 (1,3) + Rank A2 (1,5) + 4 vides
+        #             [{'type': 'indicator'}, None, {'type': 'indicator'}, None, {'type': 'indicator'}, None, None],
+        #             # Ligne 2: Les 6 métriques côte à côte
+        #             [{'type': 'bar'}, {'type': 'bar'}, {'type': 'bar'}, {'type': 'bar'}, {'type': 'bar'}, {'type': 'bar'}, None]
+        #         ],
+        #         row_heights=[0.4, 0.6],
+        #         column_widths=[0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.16],
+        #         vertical_spacing=0.1,
+        #         horizontal_spacing=0.05
+        #     )
+            
+        #     # ==================================================================
+        #     # LIGNE 1: Score C (1,1) + Rank A1 (1,3) + Rank A2 (1,5)
+        #     # ==================================================================
+            
+        #     # Score C (1,1)
+        #     c_value = values1[6]  # Le score C est le dernier
+        #     fig.add_trace(
+        #         go.Indicator(
+        #             mode="number+delta",
+        #             value=c_value,
+        #             number={'font': {'color': self.lightAccent1, 'size': 40}},
+        #             title={
+        #                 'text': f"<b>Composite Score<br>{author1.split(',')[0]}</b>",
+        #                 'font': {'color': self.lightAccent1, 'size': 14}
+        #             },
+        #             delta={'reference': values2[6], 'relative': True}
+        #         ),
+        #         row=1, col=1
+        #     )
+            
+        #     # Rank Auteur 1 (1,3)
+        #     fig.add_trace(
+        #         go.Indicator(
+        #             mode="number",
+        #             value=rank1 if isinstance(rank1, (int, float)) else 0,
+        #             number={'font': {'color': self.highlight1, 'size': 50}},
+        #             title={
+        #                 'text': f"<b>Rank<br>{author1.split(',')[0]}</b>",
+        #                 'font': {'color': self.highlight1, 'size': 14}
+        #             }
+        #         ),
+        #         row=1, col=3
+        #     )
+            
+        #     # Rank Auteur 2 (1,5)
+        #     fig.add_trace(
+        #         go.Indicator(
+        #             mode="number",
+        #             value=rank2 if isinstance(rank2, (int, float)) else 0,
+        #             number={'font': {'color': self.highlight2, 'size': 50}},
+        #             title={
+        #                 'text': f"<b>Rank<br>{author2.split(',')[0]}</b>",
+        #                 'font': {'color': self.highlight2, 'size': 14}
+        #             }
+        #         ),
+        #         row=1, col=5
+        #     )
+            
+        #     # ==================================================================
+        #     # LIGNE 2: Les 6 métriques côte à côte (2,1 à 2,6)
+        #     # ==================================================================
+            
+        #     metric_titles = ['NC', 'H', 'Hm', 'NCS', 'NCSF', 'NCSFL']
+        #     full_titles = [
+        #         'Number of citations',
+        #         'H-index', 
+        #         'Hm-index',
+        #         'Citations to single authored',
+        #         'Citations to single+first authored',
+        #         'Citations to single+first+last authored'
+        #     ]
+            
+        #     for i in range(6):
+        #         # Appliquer log si demandé
+        #         y1 = values1[i]
+        #         y2 = values2[i]
+                
+        #         if log_transform:
+        #             y1 = np.log1p(y1) if y1 > 0 else 0
+        #             y2 = np.log1p(y2) if y2 > 0 else 0
+                
+        #         # Auteur 1
+        #         fig.add_trace(
+        #             go.Bar(
+        #                 x=[author1.split(',')[0]],
+        #                 y=[y1],
+        #                 marker_color=self.highlight1,
+        #                 marker_line_width=0,
+        #                 showlegend=(i == 0),
+        #                 name=author1.split(',')[0],
+        #                 text=[f"{values1[i]:.0f}"],
+        #                 textposition='auto',
+        #                 hovertemplate=f'{full_titles[i]}<br>{author1.split(",")[0]}: %{{text}}<extra></extra>'
+        #             ),
+        #             row=2, col=i+1
+        #         )
+                
+        #         # Auteur 2
+        #         fig.add_trace(
+        #             go.Bar(
+        #                 x=[author2.split(',')[0]],
+        #                 y=[y2],
+        #                 marker_color=self.highlight2,
+        #                 marker_line_width=0,
+        #                 showlegend=(i == 0),
+        #                 name=author2.split(',')[0],
+        #                 text=[f"{values2[i]:.0f}"],
+        #                 textposition='auto',
+        #                 hovertemplate=f'{full_titles[i]}<br>{author2.split(",")[0]}: %{{text}}<extra></extra>'
+        #             ),
+        #             row=2, col=i+1
+        #         )
+            
+        #     # ==================================================================
+        #     # MISE EN FORME FINALE
+        #     # ==================================================================
+            
+        #     fig.update_layout(
+        #         height=600,
+        #         plot_bgcolor=self.bgc,
+        #         paper_bgcolor=self.bgc,
+        #         font={'color': self.lightAccent1},
+        #         showlegend=True,
+        #         legend=dict(
+        #             orientation="h",
+        #             yanchor="bottom",
+        #             y=1.02,
+        #             xanchor="center",
+        #             x=0.5
+        #         ),
+        #         title={
+        #             'text': f"Comparison: {author1.split(',')[0]} vs {author2.split(',')[0]}",
+        #             'font': {'size': 20, 'color': self.lightAccent1},
+        #             'x': 0.5
+        #         },
+        #         margin={'l': 20, 'r': 20, 't': 100, 'b': 50}
+        #     )
+            
+        #     # Mise en forme des axes pour les barres
+        #     for i in range(1, 7):
+        #         fig.update_xaxes(
+        #             showgrid=False,
+        #             tickangle=0,
+        #             tickfont={'size': 10},
+        #             row=2, col=i
+        #         )
+        #         fig.update_yaxes(
+        #             showgrid=True,
+        #             gridcolor=self.darkAccent2,
+        #             linecolor=self.darkAccent2,
+        #             row=2, col=i
+        #         )
+            
+        #     return fig
+
+
+ # def interactive_author_comparison(self):
     #     """
-    #     index = "career" if career else "singleyr"
-    #     prefix = "career" if career else "singleyr"
+    #     Interface interactive pour comparer deux auteurs.
+    #     Reproduit l'interface de author_vs_author_layout.
+    #     """
+    #     # Widgets de contrôle
+    #     # author1_search = widgets.Text(
+    #     #     value='Ioannidis, John P.A.',
+    #     #     placeholder='Nom, Prénom',
+    #     #     description='Auteur 1:',
+    #     #     style={'description_width': '80px'},
+    #     #     layout=widgets.Layout(width='350px')
+    #     # )
         
-    #     # Récupérer les données de l'auteur
-    #     data = self.get_author_data(author_name, index=index)
+    #     # author2_search = widgets.Text(
+    #     #     value='Bengio, Yoshua',
+    #     #     placeholder='Nom, Prénom',
+    #     #     description='Auteur 2:',
+    #     #     style={'description_width': '80px'},
+    #     #     layout=widgets.Layout(width='350px')
+    #     # )
+
+    #     author1_search = widgets.Combobox(
+    #         value='Ioannidis, John P.A.',
+    #         placeholder='Commencez à taper...',
+    #         options=[],
+    #         description='Auteur 1:',
+    #         ensure_option=False,
+    #         style={'description_width': '80px'},
+    #         layout=widgets.Layout(width='400px')
+    #     )
+    #     search_status1 = widgets.HTML(value='')
+
+    #     def update_suggestions1(change):
+    #         query = change['new']
+    #         if len(query) >= 3:
+    #             search_status1.value = '<i>🔍</i>'
+    #             try:
+    #                 results = self.search_authors(query, limit=20)
+    #                 suggestions = [r.get('authfull', '') for r in results if r.get('authfull')]
+    #                 author1_search.options = suggestions
+    #                 search_status1.value = f'<i>✓ {len(suggestions)}</i>'
+    #             except Exception as e:
+    #                 search_status1.value = f'<i style="color:red">❌</i>'
+    #         else:
+    #             author1_search.options = []
+    #             search_status1.value = ''
+
+    #     author1_search.observe(update_suggestions1, names='value')
+
+    #     author2_search = widgets.Combobox(
+    #         value='Bengio, Yoshua',
+    #         placeholder='Commencez à taper...',
+    #         options=[],
+    #         description='Auteur 2:',
+    #         ensure_option=False,
+    #         style={'description_width': '80px'},
+    #         layout=widgets.Layout(width='400px')
+    #     )
+         
+    #     search_status2 = widgets.HTML(value='')
+
+    #     def update_suggestions2(change):
+    #         query = change['new']
+    #         if len(query) >= 3:
+    #             search_status2.value = '<i>🔍</i>'
+    #             try:
+    #                 results = self.search_authors(query, limit=15)
+    #                 suggestions = [r.get('authfull', '') for r in results if r.get('authfull')]
+    #                 author2_search.options = suggestions
+    #                 search_status2.value = f'<i>✓ {len(suggestions)}</i>'
+    #             except Exception as e:
+    #                 search_status2.value = f'<i style="color:red">❌</i>'
+    #         else:
+    #             author2_search.options = []
+    #             search_status2.value = ''
         
-    #     if not data:
-    #         print(f"Aucune donnée trouvée pour {author_name}")
-    #         return go.Figure()
+    #     author2_search.observe(update_suggestions2, names='value')
         
-    #     key = f"{prefix}_{year}"
-    #     if key not in data:
-    #         print(f"Données non disponibles pour l'année {year}")
-    #         return go.Figure()
-        
-    #     author_data = data[key]
-        
-    #     # Récupérer les données agrégées pour comparaison
-    #     info = self.get_author_info(author_name, index=index)
-        
-    #     # Préparer les métriques
-    #     suffix = ' (ns)' if exclude_self_citations else ''
-    #     metrics_list = [f'nc{suffix}', f'h{suffix}', f'hm{suffix}', 
-    #                    f'ncs{suffix}', f'ncsf{suffix}', f'ncsfl{suffix}']
-        
-    #     metric_titles = ['Total Citations', 'H-index', 'Hm-index',
-    #                     'Cit. Single Auth.', 'Cit. Single+First', 'Cit. Single+First+Last']
-        
-    #     # Créer la figure avec sous-graphiques
-    #     fig = make_subplots(
-    #         rows=2, cols=3,
-    #         specs=[[{'type': 'indicator'}] * 3,
-    #                [{'type': 'indicator'}] * 3],
-    #         subplot_titles=metric_titles,
-    #         vertical_spacing=0.15,
-    #         horizontal_spacing=0.1
+    #     dataset_type = widgets.RadioButtons(
+    #         options=['Career', 'Single Year'],
+    #         value='Career',
+    #         description='Type:',
+    #         style={'description_width': '80px'}
     #     )
         
-    #     # Valeurs de l'auteur
-    #     author_values = [author_data.get(m, 0) for m in metrics_list]
-        
-    #     # Dans la vraie implémentation, ces valeurs viendraient de get_es_aggregate
-    #     for i, (metric, title, value) in enumerate(zip(metrics_list, metric_titles, author_values)):
-    #         row = (i // 3) + 1
-    #         col = (i % 3) + 1
-            
-    #         # Estimer médiane et max (à remplacer par vraies valeurs API)
-    #         median = value * 0.7 if value > 0 else 100
-    #         max_val = value * 1.5 if value > 0 else 1000
-            
-            
-    #         fig.add_trace(
-    #             go.Indicator(
-    #                 mode="gauge+number+delta",
-    #                 value=value,
-    #                 delta={'reference': median, 
-    #                       'increasing': {'color': "limegreen"},
-    #                       'decreasing': {'color': "indianred"}},
-    #                 gauge={
-    #                     'axis': {'range': [None, max_val], 'tickcolor': "#aaa"},
-    #                     'bar': {'color': 'lightseagreen'},
-    #                     'threshold': {
-    #                         'line': {'color': "red", 'width': 4},
-    #                         'thickness': 0.75,
-    #                         'value': median
-    #                     }
-    #                 },
-    #                 title={'text': title, 'font': {'color': '#aaa', 'size': 12}}
-    #             ),
-    #             row=row, col=col
-    #         )
-        
-    #     # Mise en forme
-    #     fig.update_layout(
-    #         height=500,
-    #         plot_bgcolor=self.bgc,
-    #         paper_bgcolor=self.bgc,
-    #         font=dict(color='lightseagreen', size=10),
-    #         title={
-    #             'text': f"{author_name} - Métriques {year}",
-    #             'font': {'size': 16, 'color': self.lightAccent1},
-    #             'x': 0.5
-    #         },
-    #         margin={'l': 20, 'r': 20, 't': 80, 'b': 20}
+    #     year_selector = widgets.Dropdown(
+    #         options=['2017', '2019', '2020', '2021'],
+    #         value='2021',
+    #         description='Année:',
+    #         style={'description_width': '80px'}
     #     )
         
-    #     return fig
-
-
-# def plot_author_career(self, author_name: str, exclude_self_citations: bool = False,
-#                         width: int = 1200, height: int = 2000) -> go.Figure:
-#     """Crée un graphique montrant l'évolution des métriques d'un auteur sur sa carrière."""
-
-#     data = self.get_author_data(author_name, index="career")
-    
-#     if not data:
-#         print(f"Aucune donnée trouvée pour {author_name}")
-#         return go.Figure()
-    
-#     # Extraire les années et les données
-#     years = []
-#     metrics_data = []
-    
-#     for key in sorted(data.keys()):
-#         if key.endswith('_log'):
-#             continue
-#         parts = key.split('_')
-#         if len(parts) == 2 and parts[0] == 'career':
-#             years.append(parts[1])
-#             metrics_data.append(data[key])
-    
-#     if not years:
-#         print(f"Aucune donnée temporelle trouvée pour {author_name}")
-#         return go.Figure()
-    
-#     # Créer le DataFrame
-#     df = pd.DataFrame(metrics_data)
-#     df['Year'] = years
-#     df['self%'] = df['self%'] * 100
-    
-#     # Définir les métriques à afficher
-#     suffix = ' (ns)' if exclude_self_citations else ''
-#     metrics_list = [
-#         f'rank{suffix}', f'c{suffix}', f'nc{suffix}', f'h{suffix}', 
-#         f'hm{suffix}', f'ncs{suffix}', f'ncsf{suffix}', f'ncsfl{suffix}',
-#         f'nps{suffix}', f'cpsf{suffix}', f'npsfl{suffix}', f'npciting{suffix}',
-#         'np', 'self%'
-#     ]
-    
-#     # Filtrer les métriques disponibles
-#     available_metrics = [m for m in metrics_list if m in df.columns]
-    
-#     # Créer les sous-titres
-#     subplot_titles = [self._get_metric_long_name(True, m) 
-#                         for m in available_metrics]
-    
-#     # Créer la figure
-#     fig = make_subplots(
-#         rows=len(available_metrics), 
-#         cols=1, 
-#         subplot_titles=subplot_titles,
-#         vertical_spacing=0.02
-#     )
-    
-#     # Palette de couleurs
-#     col_list = px.colors.sample_colorscale("turbo", 
-#                                             [n/(100-1) for n in range(100)])
-    
-#     # Ajouter les traces
-#     for i, metric in enumerate(available_metrics):
-#         fig.add_trace(
-#             go.Scatter(
-#                 x=df['Year'], 
-#                 y=df[metric],
-#                 marker=dict(color=col_list[len(col_list) - i - 25]),
-#                 name=metric,
-#                 hovertemplate='Année: %{x}<br>Valeur: %{y}<extra></extra>'
-#             ), 
-#             row=i + 1, 
-#             col=1
-#         )
-    
-#     # Mise en forme
-#     fig.update_xaxes(
-#         tickvals=years, 
-#         ticktext=years, 
-#         gridcolor=self.darkAccent2, 
-#         linecolor=self.darkAccent2, 
-#         zeroline=False
-#     )
-#     fig.update_yaxes(
-#         gridcolor=self.darkAccent2, 
-#         linecolor=self.darkAccent2, 
-#         zeroline=False
-#     )
-#     fig.update_layout(
-#         plot_bgcolor=self.bgc, 
-#         paper_bgcolor=self.bgc, 
-#         font=dict(color=self.lightAccent1),
-#         height=height,
-#         width=width,
-#         showlegend=False,
-#         title={
-#             'text': f"Données carrière: {author_name}", 
-#             'font': {'size': 20}
-#         }, 
-#         title_x=0.5
-#     )
-    
-#     return fig
-
-
-# def _get_metric_long_name(self, career: bool, metric: str, yr: int, include_year: bool ) -> str:
-#     """Obtient le nom complet d'une métrique."""
-#     metric_names = {
-#         'rank (ns)': 'Rank (no self-citations)',
-#         'nc (ns)': 'Total citations (no self-cit.)',
-#         'h (ns)': 'H-index (no self-cit.)',
-#         'hm (ns)': 'Hm-index (no self-cit.)',
-#         'nps (ns)': '# single authored papers (no self-cit.)',
-#         'ncs (ns)': 'Cit. to single authored papers (no self-cit.)',
-#         'cpsf (ns)': '# single + first authored papers (no self-cit.)',
-#         'ncsf (ns)': 'Cit. to single + first authored (no self-cit.)',
-#         'npsfl (ns)': '# single + first + last authored (no self-cit.)',
-#         'ncsfl (ns)': 'Cit. to single + first + last (no self-cit.)',
-#         'c (ns)': 'Composite score (no self-cit.)',
-#         'npciting (ns)': '# distinct citing papers (no self-cit.)',
-#         'rank': 'Rank',
-#         'nc': 'Total citations',
-#         'h': 'H-index',
-#         'hm': 'Hm-index',
-#         'nps': '# single authored papers',
-#         'ncs': 'Citations to single authored papers',
-#         'cpsf': '# single + first authored papers',
-#         'ncsf': 'Citations to single + first authored',
-#         'npsfl': '# single + first + last authored',
-#         'ncsfl': 'Citations to single + first + last',
-#         'c': 'Composite score',
-#         'npciting': '# distinct citing papers',
-#         'np': '# papers',
-#         'self%': 'Self-citation %'
-#     }
-#     return metric_names.get(metric, metric)
-
-# def get_metric_long_name(career, yr, metric, include_year = True):
-        # yrs = [2017, 2018, 2019, 2020, 2021]
-        # if yr == 0: year = 2017
-        # if yr != 0 and career == False: yr = yr + 1
-        # year = yrs[yr]
-        # if include_year == True: metric_name_dict = {
-        #     'authfull':'author name',
-        #     'inst_name':'institution name (large institutions only)',
-        #     'cntry':'country associated with most recent institution',
-        #     'np':f'number of papers from 1960 to {year}',
-        #     'firstyr':'year of first publication',
-        #     'lastyr':'year of most recent publication',
-        #     'rank (ns)':'rank based on composite score c', 
-        #     'nc (ns)':f'total cites from 1996 to {year}', 
-        #     'h (ns)':f'h-index as of the end of {year}', 
-        #     'hm (ns)':f'hm-index as of end-{year}',
-        #     'nps (ns)':'number of single authored papers',
-        #     'ncs (ns)':'total cites to single authored papers', 
-        #     'cpsf (ns)':'number of single + first authored papers', 
-        #     'ncsf (ns)':'total cites to single + first authored papers', 
-        #     'npsfl (ns)':'number of single + first + last authored papers', 
-        #     'ncsfl (ns)':'total cites to single + first + last authored papers',
-        #     'c (ns)':'composite score', 
-        #     'npciting (ns)':'number of distinct citing papers', 
-        #     'cprat (ns)':'ratio of total citations to distinct citing papers', 
-        #     'np cited (ns)':f'number of papers 1960-{year} that have been cited at least once (1996-{year})',
-        #     'self%':'self-citation percentage', 
-        #     'rank':'rank based on composite score c', 
-        #     'nc':f'total cites 1996-{year}', 
-        #     'h':f'h-index as of end-{year}',
-        #     'hm':f'hm-index as of end-{year}', 
-        #     'nps':'number of single authored papers',
-        #     'ncs':'total cites to single authored papers', 
-        #     'cpsf':'number of single + first authored papers', 
-        #     'ncsf':'total cites to single + first authored papers', 
-        #     'npsfl':'number of single + first + last authored papers', 
-        #     'ncsfl':'total cites to single + first + last authored papers',
-        #     'c':'composite score', 
-        #     'npciting':'number of distinct citing papers', 
-        #     'cprat':'ratio of total citations to distinct citing papers', 
-        #     'np cited':f'number of papers 1960-{year} that have been cited at least once (1996-{year})',
-        #     'np_d':f'# papers 1960-{year} in titles that are discontinued in Scopus', 
-        #     'nc_d':f'total cites 1996-{year} from titles that are discontinued in Scopus', 
-        #     'sm-subfield-1':'top ranked Science-Metrix category (subfield) for author', 
-        #     'sm-subfield-1-frac':'associated category fraction',
-        #     'sm-subfield-2':'second ranked Science-Metrix category (subfield) for author', 
-        #     'sm-subfield-2-frac':'associated category fraction', 
-        #     'sm-field':'top ranked higher-level Science-Metrix category (field) for author', 
-        #     'sm-field-frac':'associated category fraction',
-        #     'rank sm-subfield-1':'rank of c within category sm-subfield-1', 
-        #     'rank sm-subfield-1 (ns)':'rank of c (ns) within category sm-subfield-1', 
-        #     'sm-subfield-1 count':'total number of authors within category sm-subfield-1'}
-        # else: metric_name_dict = {
-        #     'authfull':'author name',
-        #     'inst_name':'institution name (large institutions only)',
-        #     'cntry':'country associated with most recent institution',
-        #     'np':f'number of papers',
-        #     'firstyr':'year of first publication',
-        #     'lastyr':'year of most recent publication',
-        #     'rank (ns)':'rank based on composite score c', 
-        #     'nc (ns)':f'total cites', 
-        #     'h (ns)':f'h-index', 
-        #     'hm (ns)':f'hm-index',
-        #     'nps (ns)':'number of single authored papers',
-        #     'ncs (ns)':'total cites to single authored papers', 
-        #     'cpsf (ns)':'number of single + first authored papers', 
-        #     'ncsf (ns)':'total cites to single + first authored papers', 
-        #     'npsfl (ns)':'number of single + first + last authored papers', 
-        #     'ncsfl (ns)':'total cites to single + first + last authored papers',
-        #     'c (ns)':'composite score', 
-        #     'npciting (ns)':'number of distinct citing papers', 
-        #     'cprat (ns)':'ratio of total citations to distinct citing papers', 
-        #     'np cited (ns)':f'number of papers published since 1960 that have been cited at least', # since 1996 for career wide!
-        #     'self%':'self-citation percentage', 
-        #     'rank':'rank based on composite score c', 
-        #     'nc':f'total cites', 
-        #     'h':f'h-index',
-        #     'hm':f'hm-index', 
-        #     'nps':'number of single authored papers',
-        #     'ncs':'total cites to single authored papers', 
-        #     'cpsf':'number of single + first authored papers', 
-        #     'ncsf':'total cites to single + first authored papers', 
-        #     'npsfl':'number of single + first + last authored papers', 
-        #     'ncsfl':'total cites to single + first + last authored papers',
-        #     'c':'composite score', 
-        #     'npciting':'number of distinct citing papers', 
-        #     'cprat':'ratio of total citations to distinct citing papers', 
-        #     'np cited':f'number of papers published since 1960 that have been cited at least', # since 1996 for career wide!
-        #     'np_d':f'# papers since 1960 in titles that are discontinued in Scopus', 
-        #     'nc_d':f'total cites since 1996 from titles that are discontinued in Scopus', 
-        #     'sm-subfield-1':'top ranked Science-Metrix category (subfield) for author', 
-        #     'sm-subfield-1-frac':'associated category fraction',
-        #     'sm-subfield-2':'second ranked Science-Metrix category (subfield) for author', 
-        #     'sm-subfield-2-frac':'associated category fraction', 
-        #     'sm-field':'top ranked higher-level Science-Metrix category (field) for author', 
-        #     'sm-field-frac':'associated category fraction',
-        #     'rank sm-subfield-1':'rank of c within category sm-subfield-1', 
-        #     'rank sm-subfield-1 (ns)':'rank of c (ns) within category sm-subfield-1', 
-        #     'sm-subfield-1 count':'total number of authors within category sm-subfield-1'}
-        # return metric_name_dict.get(metric, metric)
-        # return metric_name_dict[metric]
+    #     exclude_self = widgets.Checkbox(
+    #         value=False,
+    #         description='Exclure auto-citations'
+    #     )
+        
+    #     log_transform = widgets.Checkbox(
+    #         value=False,
+    #         description='Transformation log'
+    #     )
+        
+    #     update_button = widgets.Button(
+    #         description='Comparer',
+    #         button_style='primary',
+    #         icon='exchange'
+    #     )
+        
+    #     output = widgets.Output()
+        
+    #     # Fonction de mise à jour
+    #     def update_comparison(b):
+    #         with output:
+    #             clear_output(wait=True)
+                
+    #             author1 = author1_search.value
+    #             author2 = author2_search.value
+    #             is_career = dataset_type.value == 'Career'
+    #             year = year_selector.value
+    #             exclude = exclude_self.value
+    #             log_tf = log_transform.value
+                
+    #             if not author1 or not author2:
+    #                 print("Veuillez entrer les deux noms d'auteurs")
+    #                 return
+                
+    #             print(f"Comparaison de {author1} et {author2}...")
+                
+    #             try:
+    #                 fig = self.plot_author_comparison(
+    #                     author1, author2, year, is_career, exclude, log_tf
+    #                 )
+    #                 fig.show()
+                    
+    #                 # Afficher les infos pour les deux auteurs
+    #                 index = "career" if is_career else "singleyr"
+    #                 info1 = self.get_author_info(author1, index)
+    #                 info2 = self.get_author_info(author2, index)
+                    
+    #                 if info1 and info2:
+    #                     print(f"\n{author1.split(',')[0]}:")
+    #                     print(f"  Rang: {info1['rank']} | H-index: {info1['h_index']} | Citations: {info1['total_citations']}")
+                        
+    #                     print(f"\n{author2.split(',')[0]}:")
+    #                     print(f"  Rang: {info2['rank']} | H-index: {info2['h_index']} | Citations: {info2['total_citations']}")
+                
+    #             except Exception as e:
+    #                 print(f"❌ Erreur: {str(e)}")
+        
+    #     update_button.on_click(update_comparison)
+        
+    #     # Layout
+    #     controls = widgets.VBox([
+    #         widgets.HBox([author1_search, author2_search]),
+    #         widgets.HBox([dataset_type, year_selector, update_button]),
+    #         widgets.HBox([exclude_self, log_transform])
+    #     ])
+        
+    #     display(controls, output)
+        
+    #     # Affichage initial
+    #     update_comparison(None)

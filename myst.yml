@@ -1,13 +1,13 @@
 # See docs at: https://mystmd.org/guide/frontmatter
 version: 1
 project:
-  title: 'Sex-specific early neurotransmitter dynamics and post-stroke aphasia recovery'
-  subtitle: A specific dashboard template for reproducible preprints
+  title: 'A living bibliometric dashboard: Tracking Top 2% Researchers with ElasticSearch and Dash'
+  subtitle: Based on standardized citation indicators across science-wide author databases
   thebe:
     enabled: true
     binder:
       url: https://terrarium.evidencepub.io
-      repo: moranebienvenu/stroke_article 
+      repo: moranebienvenu/twopercenters_article
       ref: HEAD # Production will override this.
     kernel:
       name: python3
@@ -81,11 +81,15 @@ project:
     - file: content/figure_2.ipynb
     - file: content/figure_3.ipynb
     - file: content/figure_4.ipynb
+    - file: content/figure_5.ipynb
+    - file: content/figure_6.ipynb
   resources:
     - content/figure_1.ipynb
     - content/figure_2.ipynb
     - content/figure_3.ipynb
     - content/figure_4.ipynb
+    - content/figure_5.ipynb
+    - content/figure_6.ipynb
     - content/Dash_client.py 
 site:
   template: article-theme # Or book-theme
