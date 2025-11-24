@@ -18,7 +18,7 @@ import country_converter as coco
 from typing import Dict, List, Optional, Any, Tuple
 from IPython.display import display, clear_output,  HTML
 import ipywidgets as widgets
-import dash_daq as daq
+#import dash_daq as daq
 import plotly.io as pio
 
 pio.renderers.default = "plotly_mimetype"
