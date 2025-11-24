@@ -18,7 +18,6 @@ import country_converter as coco
 from typing import Dict, List, Optional, Any, Tuple
 from IPython.display import display, clear_output,  HTML
 import ipywidgets as widgets
-#import dash_daq as daq
 import plotly.io as pio
 
 pio.renderers.default = "plotly_mimetype"
@@ -1623,508 +1622,508 @@ class TwoPercentersClient:
         update_comparison()
     
     #author_vs_group_layout
-    def interactive_author_vs_group_comparison(self):
-        # ==========================================================================================
-        # WIDGETS DE CONTRÔLE - AUTEUR
-        # ==========================================================================================
+    # def interactive_author_vs_group_comparison(self):
+    #     # ==========================================================================================
+    #     # WIDGETS DE CONTRÔLE - AUTEUR
+    #     # ==========================================================================================
         
-        # Recherche d'auteur
-        author_search = widgets.Combobox(
-            value='Ioannidis, John P.A.',
-            placeholder='Start typing name and surname...',
-            options=[],
-            description='Author:',
-            ensure_option=False,
-            style={'description_width': '100px'},
-            layout=widgets.Layout(width='500px')
-        )
+    #     # Recherche d'auteur
+    #     author_search = widgets.Combobox(
+    #         value='Ioannidis, John P.A.',
+    #         placeholder='Start typing name and surname...',
+    #         options=[],
+    #         description='Author:',
+    #         ensure_option=False,
+    #         style={'description_width': '100px'},
+    #         layout=widgets.Layout(width='500px')
+    #     )
         
-        search_status = widgets.HTML(value='')
+    #     search_status = widgets.HTML(value='')
         
-        # Type de données pour l'auteur
-        career_single_author = widgets.Dropdown(
-            options=['Career', 'Single Year'],
-            value='Career',
-            description='Dataset:',
-            style={'description_width': '100px'}
-        )
+    #     # Type de données pour l'auteur
+    #     career_single_author = widgets.Dropdown(
+    #         options=['Career', 'Single Year'],
+    #         value='Career',
+    #         description='Dataset:',
+    #         style={'description_width': '100px'}
+    #     )
         
-        # Année pour l'auteur
-        year_author = widgets.Dropdown(
-            options=['2017', '2018', '2019', '2020', '2021'],
-            value='2021',
-            description='Year:',
-            style={'description_width': '60px'},
-            layout=widgets.Layout(width='150px')
-        )
+    #     # Année pour l'auteur
+    #     year_author = widgets.Dropdown(
+    #         options=['2017', '2018', '2019', '2020', '2021'],
+    #         value='2021',
+    #         description='Year:',
+    #         style={'description_width': '60px'},
+    #         layout=widgets.Layout(width='150px')
+    #     )
         
-        # ==========================================================================================
-        # WIDGETS DE CONTRÔLE - GROUPE
-        # ==========================================================================================
+    #     # ==========================================================================================
+    #     # WIDGETS DE CONTRÔLE - GROUPE
+    #     # ==========================================================================================
         
-        # Type de groupe
-        group_type = widgets.Dropdown(
-            options=[
-                {'label': 'Country', 'value': 'cntry'},
-                {'label': 'Field', 'value': 'sm-field'}, 
-                {'label': 'Institution', 'value': 'inst_name'}
-            ],
-            value='sm-field',
-            description='Group:',
-            style={'description_width': '100px'},
-            layout=widgets.Layout(width='200px')
-        )
+    #     # Type de groupe
+    #     group_type = widgets.Dropdown(
+    #         options=[
+    #             {'label': 'Country', 'value': 'cntry'},
+    #             {'label': 'Field', 'value': 'sm-field'}, 
+    #             {'label': 'Institution', 'value': 'inst_name'}
+    #         ],
+    #         value='sm-field',
+    #         description='Group:',
+    #         style={'description_width': '100px'},
+    #         layout=widgets.Layout(width='200px')
+    #     )
         
-        # Sélection du groupe spécifique
-        group_selection = widgets.Combobox(
-            value='Clinical Medicine',
-            placeholder='Select group...',
-            options=[],
-            description='Select:',
-            ensure_option=False,
-            style={'description_width': '100px'},
-            layout=widgets.Layout(width='400px')
-        )
+    #     # Sélection du groupe spécifique
+    #     group_selection = widgets.Combobox(
+    #         value='Clinical Medicine',
+    #         placeholder='Select group...',
+    #         options=[],
+    #         description='Select:',
+    #         ensure_option=False,
+    #         style={'description_width': '100px'},
+    #         layout=widgets.Layout(width='400px')
+    #     )
         
-        group_status = widgets.HTML(value='')
+    #     group_status = widgets.HTML(value='')
         
-        # ==========================================================================================
-        # OPTIONS GLOBALES
-        # ==========================================================================================
+    #     # ==========================================================================================
+    #     # OPTIONS GLOBALES
+    #     # ==========================================================================================
         
-        exclude_self = widgets.Checkbox(
-            value=False,
-            description='Exclude self-citations',
-            style={'description_width': '150px'}
-        )
+    #     exclude_self = widgets.Checkbox(
+    #         value=False,
+    #         description='Exclude self-citations',
+    #         style={'description_width': '150px'}
+    #     )
         
-        log_transform = widgets.Checkbox(
-            value=False,
-            description='Log transformed',
-            style={'description_width': '150px'}
-        )
+    #     log_transform = widgets.Checkbox(
+    #         value=False,
+    #         description='Log transformed',
+    #         style={'description_width': '150px'}
+    #     )
         
-        update_button = widgets.Button(
-            description='Generate Comparison',
-            button_style='success',
-            icon='refresh',
-            layout=widgets.Layout(width='250px')
-        )
+    #     update_button = widgets.Button(
+    #         description='Generate Comparison',
+    #         button_style='success',
+    #         icon='refresh',
+    #         layout=widgets.Layout(width='250px')
+    #     )
         
-        # ==========================================================================================
-        # ZONES D'AFFICHAGE
-        # ==========================================================================================
+    #     # ==========================================================================================
+    #     # ZONES D'AFFICHAGE
+    #     # ==========================================================================================
         
-        # Cartes d'information
-        info_output = widgets.Output(layout=widgets.Layout(
-            width='100%',
-            height='150px',
-            border='1px solid gray'
-        ))
+    #     # Cartes d'information
+    #     info_output = widgets.Output(layout=widgets.Layout(
+    #         width='100%',
+    #         height='150px',
+    #         border='1px solid gray'
+    #     ))
         
-        # Figures principales
-        figures_output = widgets.Output(layout=widgets.Layout(
-            width='100%', 
-            height='600px',
-            border='1px solid gray'
-        ))
+    #     # Figures principales
+    #     figures_output = widgets.Output(layout=widgets.Layout(
+    #         width='100%', 
+    #         height='600px',
+    #         border='1px solid gray'
+    #     ))
         
-        # Score C et formule
-        c_score_output = widgets.Output(layout=widgets.Layout(
-            width='100%',
-            height='400px', 
-            border='1px solid gray'
-        ))
+    #     # Score C et formule
+    #     c_score_output = widgets.Output(layout=widgets.Layout(
+    #         width='100%',
+    #         height='400px', 
+    #         border='1px solid gray'
+    #     ))
         
-        # ==========================================================================================
-        # FONCTIONS DE MISE À JOUR
-        # ==========================================================================================
+    #     # ==========================================================================================
+    #     # FONCTIONS DE MISE À JOUR
+    #     # ==========================================================================================
         
-        def update_author_suggestions(change):
-            query = change['new']
-            if len(query) >= 3:
-                search_status.value = '<i>Researching...</i>'
-                try:
-                    results = self.search_authors(query, limit=20)
-                    suggestions = [r.get('authfull', '') for r in results if r.get('authfull')]
-                    author_search.options = suggestions
-                    search_status.value = f'<i>✓ {len(suggestions)} results found</i>'
-                except Exception as e:
-                    search_status.value = f'<i style="color:red">Error: {str(e)}</i>'
-            else:
-                author_search.options = []
-                search_status.value = '<i>Write at least 3 characters...</i>'
+    #     def update_author_suggestions(change):
+    #         query = change['new']
+    #         if len(query) >= 3:
+    #             search_status.value = '<i>Researching...</i>'
+    #             try:
+    #                 results = self.search_authors(query, limit=20)
+    #                 suggestions = [r.get('authfull', '') for r in results if r.get('authfull')]
+    #                 author_search.options = suggestions
+    #                 search_status.value = f'<i>✓ {len(suggestions)} results found</i>'
+    #             except Exception as e:
+    #                 search_status.value = f'<i style="color:red">Error: {str(e)}</i>'
+    #         else:
+    #             author_search.options = []
+    #             search_status.value = '<i>Write at least 3 characters...</i>'
         
-        def update_group_suggestions(change):
-            query = change['new']
-            group = group_type.value
+    #     def update_group_suggestions(change):
+    #         query = change['new']
+    #         group = group_type.value
             
-            if not group or len(query) < 2:
-                group_selection.options = []
-                group_status.value = ''
-                return
+    #         if not group or len(query) < 2:
+    #             group_selection.options = []
+    #             group_status.value = ''
+    #             return
                 
-            group_status.value = '<i>Loading groups...</i>'
+    #         group_status.value = '<i>Loading groups...</i>'
             
-            try:
-                # Déterminer le type de données
-                career = career_single_author.value == 'Career'
-                year = year_author.value
+    #         try:
+    #             # Déterminer le type de données
+    #             career = career_single_author.value == 'Career'
+    #             year = year_author.value
                 
-                # Récupérer les options disponibles via l'API aggregate
-                url = f"{self.base_url}/aggregate/{'country' if group == 'cntry' else 'field' if group == 'sm-field' else 'institution'}"
-                params = {'limit': 500}
+    #             # Récupérer les options disponibles via l'API aggregate
+    #             url = f"{self.base_url}/aggregate/{'country' if group == 'cntry' else 'field' if group == 'sm-field' else 'institution'}"
+    #             params = {'limit': 500}
                 
-                if not career:
-                    params['year'] = year
+    #             if not career:
+    #                 params['year'] = year
                     
-                response = self.session.get(url, params=params)
-                response.raise_for_status()
+    #             response = self.session.get(url, params=params)
+    #             response.raise_for_status()
                 
-                data = response.json()
-                results = data.get('results', [])
+    #             data = response.json()
+    #             results = data.get('results', [])
                 
-                # Extraire les noms des groupes
-                group_options = []
-                for result in results:
-                    if group == 'cntry':
-                        country_code = result.get('cntry', '')
-                        if country_code and country_code not in ['csk', 'nan']:
-                            country_name = coco.convert(country_code, to='name_short')
-                            if country_name and query.lower() in country_name.lower():
-                                group_options.append(country_name)
-                    elif group == 'sm-field':
-                        field_name = result.get('sm-field', '')
-                        if field_name and field_name != 'Nan' and query.lower() in field_name.lower():
-                            group_options.append(field_name)
-                    elif group == 'inst_name':
-                        inst_name = result.get('inst_name', '')
-                        if inst_name and inst_name != 'Nan' and query.lower() in inst_name.lower():
-                            group_options.append(inst_name)
+    #             # Extraire les noms des groupes
+    #             group_options = []
+    #             for result in results:
+    #                 if group == 'cntry':
+    #                     country_code = result.get('cntry', '')
+    #                     if country_code and country_code not in ['csk', 'nan']:
+    #                         country_name = coco.convert(country_code, to='name_short')
+    #                         if country_name and query.lower() in country_name.lower():
+    #                             group_options.append(country_name)
+    #                 elif group == 'sm-field':
+    #                     field_name = result.get('sm-field', '')
+    #                     if field_name and field_name != 'Nan' and query.lower() in field_name.lower():
+    #                         group_options.append(field_name)
+    #                 elif group == 'inst_name':
+    #                     inst_name = result.get('inst_name', '')
+    #                     if inst_name and inst_name != 'Nan' and query.lower() in inst_name.lower():
+    #                         group_options.append(inst_name)
                 
-                group_selection.options = group_options[:50]  # Limiter à 50 résultats
-                group_status.value = f'<i>✓ {len(group_options)} groups found</i>'
+    #             group_selection.options = group_options[:50]  # Limiter à 50 résultats
+    #             group_status.value = f'<i>✓ {len(group_options)} groups found</i>'
                 
-            except Exception as e:
-                group_status.value = f'<i style="color:red">Error loading groups: {str(e)}</i>'
+    #         except Exception as e:
+    #             group_status.value = f'<i style="color:red">Error loading groups: {str(e)}</i>'
         
-        def update_group_type(change):
-            group_selection.value = ''
-            group_selection.options = []
-            group_selection.placeholder = f'Select {group_type.value}...'
+    #     def update_group_type(change):
+    #         group_selection.value = ''
+    #         group_selection.options = []
+    #         group_selection.placeholder = f'Select {group_type.value}...'
         
-        author_search.observe(update_author_suggestions, names='value')
-        group_selection.observe(update_group_suggestions, names='value')
-        group_type.observe(update_group_type, names='value')
+    #     author_search.observe(update_author_suggestions, names='value')
+    #     group_selection.observe(update_group_suggestions, names='value')
+    #     group_type.observe(update_group_type, names='value')
         
-        # ==========================================================================================
-        # FONCTION PRINCIPALE DE COMPARAISON
-        # ==========================================================================================
+    #     # ==========================================================================================
+    #     # FONCTION PRINCIPALE DE COMPARAISON
+    #     # ==========================================================================================
         
-        def create_comparison_figures(author_name, career_author, year_author, group_type, group_name, exclude_self, log_transform):
-            """Crée les figures de comparaison auteur vs groupe."""
+    #     def create_comparison_figures(author_name, career_author, year_author, group_type, group_name, exclude_self, log_transform):
+    #         """Crée les figures de comparaison auteur vs groupe."""
             
-            try:
-                # Récupérer les données de l'auteur
-                prefix_author = 'career' if career_author else 'singleyr'
-                author_data = self.get_author_data(author_name, prefix_author)
+    #         try:
+    #             # Récupérer les données de l'auteur
+    #             prefix_author = 'career' if career_author else 'singleyr'
+    #             author_data = self.get_author_data(author_name, prefix_author)
                 
-                if not author_data:
-                    return None, None, None, None
+    #             if not author_data:
+    #                 return None, None, None, None
                     
-                key_author = f"{prefix_author}_{year_author}"
-                if key_author not in author_data:
-                    return None, None, None, None
+    #             key_author = f"{prefix_author}_{year_author}"
+    #             if key_author not in author_data:
+    #                 return None, None, None, None
                     
-                author_metrics = author_data[key_author]
+    #             author_metrics = author_data[key_author]
                 
-                # Récupérer les données du groupe via API aggregate
-                if group_type == 'cntry':
-                    api_type = 'country'
-                    # Convertir le nom du pays en code
-                    try:
-                        country_code = coco.convert(names=group_name, to='ISO2')
-                        group_value = country_code.lower()
-                    except:
-                        group_value = group_name.lower()
-                elif group_type == 'sm-field':
-                    api_type = 'field'
-                    group_value = group_name
-                else:  # 'inst_name'
-                    api_type = 'institution' 
-                    group_value = group_name
+    #             # Récupérer les données du groupe via API aggregate
+    #             if group_type == 'cntry':
+    #                 api_type = 'country'
+    #                 # Convertir le nom du pays en code
+    #                 try:
+    #                     country_code = coco.convert(names=group_name, to='ISO2')
+    #                     group_value = country_code.lower()
+    #                 except:
+    #                     group_value = group_name.lower()
+    #             elif group_type == 'sm-field':
+    #                 api_type = 'field'
+    #                 group_value = group_name
+    #             else:  # 'inst_name'
+    #                 api_type = 'institution' 
+    #                 group_value = group_name
                 
-                group_data = self.get_es_aggregate(group_type, group_value, prefix_author)
+    #             group_data = self.get_es_aggregate(group_type, group_value, prefix_author)
                 
-                if not group_data:
-                    return None, None, None, None
+    #             if not group_data:
+    #                 return None, None, None, None
                     
-                # Informations pour les cartes
-                suffix = ' (ns)' if exclude_self else ''
+    #             # Informations pour les cartes
+    #             suffix = ' (ns)' if exclude_self else ''
                 
-                # Carte Auteur
-                author_rank = author_metrics.get(f'rank{suffix}', 'N/A')
-                author_self_cit = round(author_metrics.get('self%', 0) * 100, 2)
-                author_country = author_metrics.get('cntry', 'N/A')
-                author_field = author_metrics.get('sm-field', 'N/A')
-                author_institute = author_metrics.get('inst_name', 'N/A')
+    #             # Carte Auteur
+    #             author_rank = author_metrics.get(f'rank{suffix}', 'N/A')
+    #             author_self_cit = round(author_metrics.get('self%', 0) * 100, 2)
+    #             author_country = author_metrics.get('cntry', 'N/A')
+    #             author_field = author_metrics.get('sm-field', 'N/A')
+    #             author_institute = author_metrics.get('inst_name', 'N/A')
                 
-                # Carte Groupe
-                group_self_cit = round(group_data[f'{prefix_author}_{year_author}']['self%'][2] * 100, 2)
-                group_size = group_data[f'{prefix_author}_{year_author}'].get('c', [0,0,0,0,0])[4]  # Utiliser le count comme proxy
+    #             # Carte Groupe
+    #             group_self_cit = round(group_data[f'{prefix_author}_{year_author}']['self%'][2] * 100, 2)
+    #             group_size = group_data[f'{prefix_author}_{year_author}'].get('c', [0,0,0,0,0])[4]  # Utiliser le count comme proxy
                 
-                # Créer les 7 figures (6 métriques + score C)
-                metrics_base = ['nc', 'h', 'hm', 'ncs', 'ncsf', 'ncsfl', 'c']
-                metrics_with_suffix = [f'{m}{suffix}' for m in metrics_base]
+    #             # Créer les 7 figures (6 métriques + score C)
+    #             metrics_base = ['nc', 'h', 'hm', 'ncs', 'ncsf', 'ncsfl', 'c']
+    #             metrics_with_suffix = [f'{m}{suffix}' for m in metrics_base]
                 
-                metric_titles = [
-                    'Number of citations<br>(NC)', 
-                    'H-index<br>(H)', 
-                    'Hm-index<br>(Hm)', 
-                    'Number of citations to<br>single authored papers<br>(NCS)', 
-                    'Number of citations to<br>single and first<br>authored papers<br>(NCSF)', 
-                    'Number of citations to<br>single, first and<br>last authored papers<br>(NCSFL)', 
-                    'Composite score (C)'
-                ]
+    #             metric_titles = [
+    #                 'Number of citations<br>(NC)', 
+    #                 'H-index<br>(H)', 
+    #                 'Hm-index<br>(Hm)', 
+    #                 'Number of citations to<br>single authored papers<br>(NCS)', 
+    #                 'Number of citations to<br>single and first<br>authored papers<br>(NCSF)', 
+    #                 'Number of citations to<br>single, first and<br>last authored papers<br>(NCSFL)', 
+    #                 'Composite score (C)'
+    #             ]
                 
-                fig_list = []
+    #             fig_list = []
                 
-                for i, metric in enumerate(metrics_with_suffix):
-                    base_metric = metrics_base[i]
+    #             for i, metric in enumerate(metrics_with_suffix):
+    #                 base_metric = metrics_base[i]
                     
-                    # Valeur de l'auteur
-                    author_value = author_metrics.get(metric, 0)
+    #                 # Valeur de l'auteur
+    #                 author_value = author_metrics.get(metric, 0)
                     
-                    # Données du groupe (box plot)
-                    group_stats = group_data[f'{prefix_author}_{year_author}'][base_metric]
+    #                 # Données du groupe (box plot)
+    #                 group_stats = group_data[f'{prefix_author}_{year_author}'][base_metric]
                     
-                    # Créer la figure
-                    fig = go.Figure()
+    #                 # Créer la figure
+    #                 fig = go.Figure()
                     
-                    # Box plot du groupe
-                    fig.add_trace(go.Box(
-                        y=[group_stats],  # [min, q1, median, q3, max]
-                        name=group_name,
-                        marker_color=self.highlight2,
-                        boxpoints=False,
-                        whiskerwidth=0.2,
-                        fillcolor='rgba(173, 216, 230, 0.5)',
-                        line=dict(color=self.highlight2)
-                    ))
+    #                 # Box plot du groupe
+    #                 fig.add_trace(go.Box(
+    #                     y=[group_stats],  # [min, q1, median, q3, max]
+    #                     name=group_name,
+    #                     marker_color=self.highlight2,
+    #                     boxpoints=False,
+    #                     whiskerwidth=0.2,
+    #                     fillcolor='rgba(173, 216, 230, 0.5)',
+    #                     line=dict(color=self.highlight2)
+    #                 ))
                     
-                    # Ligne pour la valeur de l'auteur
-                    fig.add_hline(
-                        y=author_value,
-                        line_dash="dash",
-                        line_color=self.highlight1,
-                        line_width=3,
-                        annotation_text=f"Author: {author_value:.1f}",
-                        annotation_font_color=self.highlight1,
-                        annotation_position="top left"
-                    )
+    #                 # Ligne pour la valeur de l'auteur
+    #                 fig.add_hline(
+    #                     y=author_value,
+    #                     line_dash="dash",
+    #                     line_color=self.highlight1,
+    #                     line_width=3,
+    #                     annotation_text=f"Author: {author_value:.1f}",
+    #                     annotation_font_color=self.highlight1,
+    #                     annotation_position="top left"
+    #                 )
                     
-                    # Mise en forme
-                    fig.update_layout(
-                        height=250,
-                        title={
-                            'text': metric_titles[i],
-                            'font': {'size': 14, 'color': self.lightAccent1},
-                            'x': 0.5
-                        },
-                        plot_bgcolor=self.bgc,
-                        paper_bgcolor=self.bgc,
-                        font={'color': self.lightAccent1},
-                        showlegend=False,
-                        margin={'l': 40, 'r': 20, 't': 60, 'b': 40}
-                    )
+    #                 # Mise en forme
+    #                 fig.update_layout(
+    #                     height=250,
+    #                     title={
+    #                         'text': metric_titles[i],
+    #                         'font': {'size': 14, 'color': self.lightAccent1},
+    #                         'x': 0.5
+    #                     },
+    #                     plot_bgcolor=self.bgc,
+    #                     paper_bgcolor=self.bgc,
+    #                     font={'color': self.lightAccent1},
+    #                     showlegend=False,
+    #                     margin={'l': 40, 'r': 20, 't': 60, 'b': 40}
+    #                 )
                     
-                    fig.update_xaxes(showticklabels=False)
-                    fig.update_yaxes(showgrid=True, gridcolor=self.darkAccent2)
+    #                 fig.update_xaxes(showticklabels=False)
+    #                 fig.update_yaxes(showgrid=True, gridcolor=self.darkAccent2)
                     
-                    fig_list.append(fig)
+    #                 fig_list.append(fig)
                 
-                return fig_list, author_rank, group_size, {
-                    'author': {
-                        'name': author_name,
-                        'rank': author_rank,
-                        'self_cit': author_self_cit,
-                        'country': author_country,
-                        'field': author_field,
-                        'institute': author_institute
-                    },
-                    'group': {
-                        'name': group_name,
-                        'type': group_type,
-                        'self_cit': group_self_cit,
-                        'size': group_size
-                    }
-                }
+    #             return fig_list, author_rank, group_size, {
+    #                 'author': {
+    #                     'name': author_name,
+    #                     'rank': author_rank,
+    #                     'self_cit': author_self_cit,
+    #                     'country': author_country,
+    #                     'field': author_field,
+    #                     'institute': author_institute
+    #                 },
+    #                 'group': {
+    #                     'name': group_name,
+    #                     'type': group_type,
+    #                     'self_cit': group_self_cit,
+    #                     'size': group_size
+    #                 }
+    #             }
                 
-            except Exception as e:
-                print(f"Error creating figures: {e}")
-                return None, None, None, None
+    #         except Exception as e:
+    #             print(f"Error creating figures: {e}")
+    #             return None, None, None, None
         
-        def update_comparison(b=None):
-            with info_output:
-                clear_output(wait=True)
-            with figures_output:
-                clear_output(wait=True)
-            with c_score_output:
-                clear_output(wait=True)
+    #     def update_comparison(b=None):
+    #         with info_output:
+    #             clear_output(wait=True)
+    #         with figures_output:
+    #             clear_output(wait=True)
+    #         with c_score_output:
+    #             clear_output(wait=True)
                 
-            author_name = author_search.value
-            career_author = career_single_author.value == 'Career'
-            year_author_val = year_author.value
-            group_type_val = group_type.value
-            group_name_val = group_selection.value
-            exclude_self_val = exclude_self.value
-            log_transform_val = log_transform.value
+    #         author_name = author_search.value
+    #         career_author = career_single_author.value == 'Career'
+    #         year_author_val = year_author.value
+    #         group_type_val = group_type.value
+    #         group_name_val = group_selection.value
+    #         exclude_self_val = exclude_self.value
+    #         log_transform_val = log_transform.value
             
-            if not author_name or not group_name_val:
-                with info_output:
-                    print("❌ Please select both an author and a group")
-                return
+    #         if not author_name or not group_name_val:
+    #             with info_output:
+    #                 print("❌ Please select both an author and a group")
+    #             return
             
-            try:
-                with info_output:
-                    print("🔄 Generating comparison...")
+    #         try:
+    #             with info_output:
+    #                 print("🔄 Generating comparison...")
                 
-                # Créer les figures
-                fig_list, author_rank, group_size, info_dict = create_comparison_figures(
-                    author_name, career_author, year_author_val, group_type_val, 
-                    group_name_val, exclude_self_val, log_transform_val
-                )
+    #             # Créer les figures
+    #             fig_list, author_rank, group_size, info_dict = create_comparison_figures(
+    #                 author_name, career_author, year_author_val, group_type_val, 
+    #                 group_name_val, exclude_self_val, log_transform_val
+    #             )
                 
-                if not fig_list:
-                    with info_output:
-                        print("❌ No data available for the selected combination")
-                    return
+    #             if not fig_list:
+    #                 with info_output:
+    #                     print("❌ No data available for the selected combination")
+    #                 return
                 
-                # Afficher les cartes d'information
-                with info_output:
-                    clear_output(wait=True)
+    #             # Afficher les cartes d'information
+    #             with info_output:
+    #                 clear_output(wait=True)
                     
-                    # HTML pour les cartes
-                    author_html = f"""
-                    <div style="display: flex; justify-content: space-between; padding: 10px;">
-                        <div style="background-color: {self.highlight1}; padding: 15px; border-radius: 8px; width: 48%;">
-                            <h4 style="color: {self.darkAccent1}; margin: 0 0 10px 0;">Author: {info_dict['author']['name']}</h4>
-                            <p style="color: {self.darkAccent1}; margin: 5px 0;">
-                                <strong>Rank:</strong> {info_dict['author']['rank']}<br>
-                                <strong>Country:</strong> {info_dict['author']['country']}<br>
-                                <strong>Field:</strong> {info_dict['author']['field']}<br>
-                                <strong>Institute:</strong> {info_dict['author']['institute']}<br>
-                                <strong>Self-citation:</strong> {info_dict['author']['self_cit']}%
-                            </p>
-                        </div>
-                        <div style="background-color: {self.highlight2}; padding: 15px; border-radius: 8px; width: 48%;">
-                            <h4 style="color: {self.darkAccent1}; margin: 0 0 10px 0;">Group: {info_dict['group']['name']}</h4>
-                            <p style="color: {self.darkAccent1}; margin: 5px 0;">
-                                <strong>Type:</strong> {info_dict['group']['type']}<br>
-                                <strong>Group size:</strong> {info_dict['group']['size']} authors<br>
-                                <strong>Median self-citation:</strong> {info_dict['group']['self_cit']}%
-                            </p>
-                        </div>
-                    </div>
-                    """
-                    display(HTML(author_html))
+    #                 # HTML pour les cartes
+    #                 author_html = f"""
+    #                 <div style="display: flex; justify-content: space-between; padding: 10px;">
+    #                     <div style="background-color: {self.highlight1}; padding: 15px; border-radius: 8px; width: 48%;">
+    #                         <h4 style="color: {self.darkAccent1}; margin: 0 0 10px 0;">Author: {info_dict['author']['name']}</h4>
+    #                         <p style="color: {self.darkAccent1}; margin: 5px 0;">
+    #                             <strong>Rank:</strong> {info_dict['author']['rank']}<br>
+    #                             <strong>Country:</strong> {info_dict['author']['country']}<br>
+    #                             <strong>Field:</strong> {info_dict['author']['field']}<br>
+    #                             <strong>Institute:</strong> {info_dict['author']['institute']}<br>
+    #                             <strong>Self-citation:</strong> {info_dict['author']['self_cit']}%
+    #                         </p>
+    #                     </div>
+    #                     <div style="background-color: {self.highlight2}; padding: 15px; border-radius: 8px; width: 48%;">
+    #                         <h4 style="color: {self.darkAccent1}; margin: 0 0 10px 0;">Group: {info_dict['group']['name']}</h4>
+    #                         <p style="color: {self.darkAccent1}; margin: 5px 0;">
+    #                             <strong>Type:</strong> {info_dict['group']['type']}<br>
+    #                             <strong>Group size:</strong> {info_dict['group']['size']} authors<br>
+    #                             <strong>Median self-citation:</strong> {info_dict['group']['self_cit']}%
+    #                         </p>
+    #                     </div>
+    #                 </div>
+    #                 """
+    #                 display(HTML(author_html))
                 
-                # Afficher les 6 premières métriques
-                with figures_output:
-                    clear_output(wait=True)
+    #             # Afficher les 6 premières métriques
+    #             with figures_output:
+    #                 clear_output(wait=True)
                     
-                    # Créer un layout en grille 2x3 pour les 6 premières métriques
-                    from IPython.display import display, HTML
+    #                 # Créer un layout en grille 2x3 pour les 6 premières métriques
+    #                 from IPython.display import display, HTML
                     
-                    # Afficher les figures côte à côte
-                    fig_html = ""
-                    for i in range(6):
-                        fig_html += f"""
-                        <div style="display: inline-block; width: 33%; padding: 5px;">
-                            {fig_list[i].to_html(include_plotlyjs='cdn' if i == 0 else False, div_id=f"plot{i}")}
-                        </div>
-                        """
-                        if (i + 1) % 3 == 0:  # Nouvelle ligne après 3 figures
-                            fig_html += "<div style='clear: both;'></div>"
+    #                 # Afficher les figures côte à côte
+    #                 fig_html = ""
+    #                 for i in range(6):
+    #                     fig_html += f"""
+    #                     <div style="display: inline-block; width: 33%; padding: 5px;">
+    #                         {fig_list[i].to_html(include_plotlyjs='cdn' if i == 0 else False, div_id=f"plot{i}")}
+    #                     </div>
+    #                     """
+    #                     if (i + 1) % 3 == 0:  # Nouvelle ligne après 3 figures
+    #                         fig_html += "<div style='clear: both;'></div>"
                     
-                    display(HTML(fig_html))
+    #                 display(HTML(fig_html))
                 
-                # Afficher le score C et la formule
-                with c_score_output:
-                    clear_output(wait=True)
+    #             # Afficher le score C et la formule
+    #             with c_score_output:
+    #                 clear_output(wait=True)
                     
-                    # Figure du score C
-                    display(fig_list[6])
+    #                 # Figure du score C
+    #                 display(fig_list[6])
                     
-                    # Formule du score C
-                    formula_html = f"""
-                    <div style="background-color: {self.darkAccent1}; padding: 20px; border-radius: 10px; margin-top: 20px; text-align: center;">
-                        <div style="color: {self.lightAccent1}; font-size: 16px; margin-bottom: 10px;">
-                            <strong>Composite Score Formula</strong>
-                        </div>
-                        <div style="color: {self.lightAccent1}; font-size: 18px; font-family: 'Courier New', monospace;">
-                            c = (6×nc + 6×h + 5×h<sub>m</sub> + 4×nc<sub>s</sub> + 3×nc<sub>sf</sub> + 2×nc<sub>sfl</sub>) / 26
-                        </div>
-                        <div style="color: {self.darkAccent3}; font-size: 14px; margin-top: 10px;">
-                            Author rank: <strong>{author_rank}</strong> | Group size: <strong>{group_size}</strong> authors
-                        </div>
-                    </div>
-                    """
-                    display(HTML(formula_html))
+    #                 # Formule du score C
+    #                 formula_html = f"""
+    #                 <div style="background-color: {self.darkAccent1}; padding: 20px; border-radius: 10px; margin-top: 20px; text-align: center;">
+    #                     <div style="color: {self.lightAccent1}; font-size: 16px; margin-bottom: 10px;">
+    #                         <strong>Composite Score Formula</strong>
+    #                     </div>
+    #                     <div style="color: {self.lightAccent1}; font-size: 18px; font-family: 'Courier New', monospace;">
+    #                         c = (6×nc + 6×h + 5×h<sub>m</sub> + 4×nc<sub>s</sub> + 3×nc<sub>sf</sub> + 2×nc<sub>sfl</sub>) / 26
+    #                     </div>
+    #                     <div style="color: {self.darkAccent3}; font-size: 14px; margin-top: 10px;">
+    #                         Author rank: <strong>{author_rank}</strong> | Group size: <strong>{group_size}</strong> authors
+    #                     </div>
+    #                 </div>
+    #                 """
+    #                 display(HTML(formula_html))
                     
-            except Exception as e:
-                with info_output:
-                    print(f"❌ Error generating comparison: {str(e)}")
-                import traceback
-                traceback.print_exc()
+    #         except Exception as e:
+    #             with info_output:
+    #                 print(f"❌ Error generating comparison: {str(e)}")
+    #             import traceback
+    #             traceback.print_exc()
         
-        update_button.on_click(update_comparison)
+    #     update_button.on_click(update_comparison)
         
-        # ==========================================================================================
-        # LAYOUT FINAL
-        # ==========================================================================================
+    #     # ==========================================================================================
+    #     # LAYOUT FINAL
+    #     # ==========================================================================================
         
-        # Contrôles Auteur
-        author_controls = widgets.VBox([
-            widgets.HBox([author_search, search_status]),
-            widgets.HBox([career_single_author, year_author])
-        ], layout=widgets.Layout(border='1px solid gray', padding='10px'))
+    #     # Contrôles Auteur
+    #     author_controls = widgets.VBox([
+    #         widgets.HBox([author_search, search_status]),
+    #         widgets.HBox([career_single_author, year_author])
+    #     ], layout=widgets.Layout(border='1px solid gray', padding='10px'))
         
-        # Contrôles Groupe
-        group_controls = widgets.VBox([
-            widgets.HBox([group_type]),
-            widgets.HBox([group_selection, group_status])
-        ], layout=widgets.Layout(border='1px solid gray', padding='10px'))
+    #     # Contrôles Groupe
+    #     group_controls = widgets.VBox([
+    #         widgets.HBox([group_type]),
+    #         widgets.HBox([group_selection, group_status])
+    #     ], layout=widgets.Layout(border='1px solid gray', padding='10px'))
         
-        # Options globales
-        global_controls = widgets.HBox([
-            exclude_self,
-            log_transform,
-            update_button
-        ], layout=widgets.Layout(border='1px solid gray', padding='10px', justify_content='space-between'))
+    #     # Options globales
+    #     global_controls = widgets.HBox([
+    #         exclude_self,
+    #         log_transform,
+    #         update_button
+    #     ], layout=widgets.Layout(border='1px solid gray', padding='10px', justify_content='space-between'))
         
-        # Layout principal
-        main_layout = widgets.VBox([
-            widgets.HTML("<h2 style='color: #ECAB4C;'>Author vs Group Comparison</h2>"),
-            widgets.HBox([author_controls, group_controls]),
-            global_controls,
-            widgets.HTML("<h3 style='color: #ECAB4C;'>Information Cards</h3>"),
-            info_output,
-            widgets.HTML("<h3 style='color: #ECAB4C;'>Performance Metrics Comparison</h3>"),
-            figures_output,
-            widgets.HTML("<h3 style='color: #ECAB4C;'>Composite Score & Formula</h3>"),
-            c_score_output
-        ])
+    #     # Layout principal
+    #     main_layout = widgets.VBox([
+    #         widgets.HTML("<h2 style='color: #ECAB4C;'>Author vs Group Comparison</h2>"),
+    #         widgets.HBox([author_controls, group_controls]),
+    #         global_controls,
+    #         widgets.HTML("<h3 style='color: #ECAB4C;'>Information Cards</h3>"),
+    #         info_output,
+    #         widgets.HTML("<h3 style='color: #ECAB4C;'>Performance Metrics Comparison</h3>"),
+    #         figures_output,
+    #         widgets.HTML("<h3 style='color: #ECAB4C;'>Composite Score & Formula</h3>"),
+    #         c_score_output
+    #     ])
         
-        # Affichage
-        display(main_layout)
+    #     # Affichage
+    #     display(main_layout)
         
-        # Initialiser les suggestions de groupe
-        update_group_type(None)
+    #     # Initialiser les suggestions de groupe
+    #     update_group_type(None)
     
-    #group_vs_group_layout
-    def interactive_group_vs_group_comparison(self):
-        return 
+    # #group_vs_group_layout
+    # def interactive_group_vs_group_comparison(self):
+    #     return 
     
     # ========================================================================
     # VISUALISATION - MAPS
@@ -2505,369 +2504,3 @@ class TwoPercentersClient:
         # Génération initiale
         update_map()
 
-
-# ========================================================================
-# Anciens tests
-# ========================================================================
-
-
-        # def create_comparison_figures(author1, career1, year1, author2, career2, year2, exclude_self, log_transform):
-        #     """Crée une seule figure avec le layout spécifié."""
-            
-        #     # Récupérer les données
-        #     prefix1 = 'career' if career1 else 'singleyr'
-        #     prefix2 = 'career' if career2 else 'singleyr'
-            
-        #     data1 = self.get_author_data(author1, prefix1)
-        #     data2 = self.get_author_data(author2, prefix2)
-            
-        #     if not data1 or not data2:
-        #         return None
-            
-        #     # Extraire les données de l'année
-        #     key1 = f"{prefix1}_{year1}"
-        #     key2 = f"{prefix2}_{year2}"
-            
-        #     if key1 not in data1 or key2 not in data2:
-        #         return None
-            
-        #     metrics1 = data1[key1]
-        #     metrics2 = data2[key2]
-            
-        #     # Définir les métriques
-        #     suffix = ' (ns)' if exclude_self else ''
-        #     metrics_list = ['nc', 'h', 'hm', 'ncs', 'ncsf', 'ncsfl', 'c']
-        #     metrics_with_suffix = [f'{m}{suffix}' for m in metrics_list]
-            
-        #     # Récupérer les valeurs
-        #     values1 = [metrics1.get(m, 0) for m in metrics_with_suffix]
-        #     values2 = [metrics2.get(m, 0) for m in metrics_with_suffix]
-            
-        #     # Rangs
-        #     rank1 = metrics1.get(f'rank{suffix}', 'N/A')
-        #     rank2 = metrics2.get(f'rank{suffix}', 'N/A')
-            
-        #     # Créer UNE SEULE grande figure avec 2 lignes et 7 colonnes
-        #     fig = make_subplots(
-        #         rows=2, cols=7,
-        #         specs=[
-        #             # Ligne 1: Score C (1,1) + Rank A1 (1,3) + Rank A2 (1,5) + 4 vides
-        #             [{'type': 'indicator'}, None, {'type': 'indicator'}, None, {'type': 'indicator'}, None, None],
-        #             # Ligne 2: Les 6 métriques côte à côte
-        #             [{'type': 'bar'}, {'type': 'bar'}, {'type': 'bar'}, {'type': 'bar'}, {'type': 'bar'}, {'type': 'bar'}, None]
-        #         ],
-        #         row_heights=[0.4, 0.6],
-        #         column_widths=[0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.16],
-        #         vertical_spacing=0.1,
-        #         horizontal_spacing=0.05
-        #     )
-            
-        #     # ==================================================================
-        #     # LIGNE 1: Score C (1,1) + Rank A1 (1,3) + Rank A2 (1,5)
-        #     # ==================================================================
-            
-        #     # Score C (1,1)
-        #     c_value = values1[6]  # Le score C est le dernier
-        #     fig.add_trace(
-        #         go.Indicator(
-        #             mode="number+delta",
-        #             value=c_value,
-        #             number={'font': {'color': self.lightAccent1, 'size': 40}},
-        #             title={
-        #                 'text': f"<b>Composite Score<br>{author1.split(',')[0]}</b>",
-        #                 'font': {'color': self.lightAccent1, 'size': 14}
-        #             },
-        #             delta={'reference': values2[6], 'relative': True}
-        #         ),
-        #         row=1, col=1
-        #     )
-            
-        #     # Rank Auteur 1 (1,3)
-        #     fig.add_trace(
-        #         go.Indicator(
-        #             mode="number",
-        #             value=rank1 if isinstance(rank1, (int, float)) else 0,
-        #             number={'font': {'color': self.highlight1, 'size': 50}},
-        #             title={
-        #                 'text': f"<b>Rank<br>{author1.split(',')[0]}</b>",
-        #                 'font': {'color': self.highlight1, 'size': 14}
-        #             }
-        #         ),
-        #         row=1, col=3
-        #     )
-            
-        #     # Rank Auteur 2 (1,5)
-        #     fig.add_trace(
-        #         go.Indicator(
-        #             mode="number",
-        #             value=rank2 if isinstance(rank2, (int, float)) else 0,
-        #             number={'font': {'color': self.highlight2, 'size': 50}},
-        #             title={
-        #                 'text': f"<b>Rank<br>{author2.split(',')[0]}</b>",
-        #                 'font': {'color': self.highlight2, 'size': 14}
-        #             }
-        #         ),
-        #         row=1, col=5
-        #     )
-            
-        #     # ==================================================================
-        #     # LIGNE 2: Les 6 métriques côte à côte (2,1 à 2,6)
-        #     # ==================================================================
-            
-        #     metric_titles = ['NC', 'H', 'Hm', 'NCS', 'NCSF', 'NCSFL']
-        #     full_titles = [
-        #         'Number of citations',
-        #         'H-index', 
-        #         'Hm-index',
-        #         'Citations to single authored',
-        #         'Citations to single+first authored',
-        #         'Citations to single+first+last authored'
-        #     ]
-            
-        #     for i in range(6):
-        #         # Appliquer log si demandé
-        #         y1 = values1[i]
-        #         y2 = values2[i]
-                
-        #         if log_transform:
-        #             y1 = np.log1p(y1) if y1 > 0 else 0
-        #             y2 = np.log1p(y2) if y2 > 0 else 0
-                
-        #         # Auteur 1
-        #         fig.add_trace(
-        #             go.Bar(
-        #                 x=[author1.split(',')[0]],
-        #                 y=[y1],
-        #                 marker_color=self.highlight1,
-        #                 marker_line_width=0,
-        #                 showlegend=(i == 0),
-        #                 name=author1.split(',')[0],
-        #                 text=[f"{values1[i]:.0f}"],
-        #                 textposition='auto',
-        #                 hovertemplate=f'{full_titles[i]}<br>{author1.split(",")[0]}: %{{text}}<extra></extra>'
-        #             ),
-        #             row=2, col=i+1
-        #         )
-                
-        #         # Auteur 2
-        #         fig.add_trace(
-        #             go.Bar(
-        #                 x=[author2.split(',')[0]],
-        #                 y=[y2],
-        #                 marker_color=self.highlight2,
-        #                 marker_line_width=0,
-        #                 showlegend=(i == 0),
-        #                 name=author2.split(',')[0],
-        #                 text=[f"{values2[i]:.0f}"],
-        #                 textposition='auto',
-        #                 hovertemplate=f'{full_titles[i]}<br>{author2.split(",")[0]}: %{{text}}<extra></extra>'
-        #             ),
-        #             row=2, col=i+1
-        #         )
-            
-        #     # ==================================================================
-        #     # MISE EN FORME FINALE
-        #     # ==================================================================
-            
-        #     fig.update_layout(
-        #         height=600,
-        #         plot_bgcolor=self.bgc,
-        #         paper_bgcolor=self.bgc,
-        #         font={'color': self.lightAccent1},
-        #         showlegend=True,
-        #         legend=dict(
-        #             orientation="h",
-        #             yanchor="bottom",
-        #             y=1.02,
-        #             xanchor="center",
-        #             x=0.5
-        #         ),
-        #         title={
-        #             'text': f"Comparison: {author1.split(',')[0]} vs {author2.split(',')[0]}",
-        #             'font': {'size': 20, 'color': self.lightAccent1},
-        #             'x': 0.5
-        #         },
-        #         margin={'l': 20, 'r': 20, 't': 100, 'b': 50}
-        #     )
-            
-        #     # Mise en forme des axes pour les barres
-        #     for i in range(1, 7):
-        #         fig.update_xaxes(
-        #             showgrid=False,
-        #             tickangle=0,
-        #             tickfont={'size': 10},
-        #             row=2, col=i
-        #         )
-        #         fig.update_yaxes(
-        #             showgrid=True,
-        #             gridcolor=self.darkAccent2,
-        #             linecolor=self.darkAccent2,
-        #             row=2, col=i
-        #         )
-            
-        #     return fig
-
-
- # def interactive_author_comparison(self):
-    #     """
-    #     Interface interactive pour comparer deux auteurs.
-    #     Reproduit l'interface de author_vs_author_layout.
-    #     """
-    #     # Widgets de contrôle
-    #     # author1_search = widgets.Text(
-    #     #     value='Ioannidis, John P.A.',
-    #     #     placeholder='Nom, Prénom',
-    #     #     description='Auteur 1:',
-    #     #     style={'description_width': '80px'},
-    #     #     layout=widgets.Layout(width='350px')
-    #     # )
-        
-    #     # author2_search = widgets.Text(
-    #     #     value='Bengio, Yoshua',
-    #     #     placeholder='Nom, Prénom',
-    #     #     description='Auteur 2:',
-    #     #     style={'description_width': '80px'},
-    #     #     layout=widgets.Layout(width='350px')
-    #     # )
-
-    #     author1_search = widgets.Combobox(
-    #         value='Ioannidis, John P.A.',
-    #         placeholder='Commencez à taper...',
-    #         options=[],
-    #         description='Auteur 1:',
-    #         ensure_option=False,
-    #         style={'description_width': '80px'},
-    #         layout=widgets.Layout(width='400px')
-    #     )
-    #     search_status1 = widgets.HTML(value='')
-
-    #     def update_suggestions1(change):
-    #         query = change['new']
-    #         if len(query) >= 3:
-    #             search_status1.value = '<i>🔍</i>'
-    #             try:
-    #                 results = self.search_authors(query, limit=20)
-    #                 suggestions = [r.get('authfull', '') for r in results if r.get('authfull')]
-    #                 author1_search.options = suggestions
-    #                 search_status1.value = f'<i>✓ {len(suggestions)}</i>'
-    #             except Exception as e:
-    #                 search_status1.value = f'<i style="color:red">❌</i>'
-    #         else:
-    #             author1_search.options = []
-    #             search_status1.value = ''
-
-    #     author1_search.observe(update_suggestions1, names='value')
-
-    #     author2_search = widgets.Combobox(
-    #         value='Bengio, Yoshua',
-    #         placeholder='Commencez à taper...',
-    #         options=[],
-    #         description='Auteur 2:',
-    #         ensure_option=False,
-    #         style={'description_width': '80px'},
-    #         layout=widgets.Layout(width='400px')
-    #     )
-         
-    #     search_status2 = widgets.HTML(value='')
-
-    #     def update_suggestions2(change):
-    #         query = change['new']
-    #         if len(query) >= 3:
-    #             search_status2.value = '<i>🔍</i>'
-    #             try:
-    #                 results = self.search_authors(query, limit=15)
-    #                 suggestions = [r.get('authfull', '') for r in results if r.get('authfull')]
-    #                 author2_search.options = suggestions
-    #                 search_status2.value = f'<i>✓ {len(suggestions)}</i>'
-    #             except Exception as e:
-    #                 search_status2.value = f'<i style="color:red">❌</i>'
-    #         else:
-    #             author2_search.options = []
-    #             search_status2.value = ''
-        
-    #     author2_search.observe(update_suggestions2, names='value')
-        
-    #     dataset_type = widgets.RadioButtons(
-    #         options=['Career', 'Single Year'],
-    #         value='Career',
-    #         description='Type:',
-    #         style={'description_width': '80px'}
-    #     )
-        
-    #     year_selector = widgets.Dropdown(
-    #         options=['2017', '2019', '2020', '2021'],
-    #         value='2021',
-    #         description='Année:',
-    #         style={'description_width': '80px'}
-    #     )
-        
-    #     exclude_self = widgets.Checkbox(
-    #         value=False,
-    #         description='Exclure auto-citations'
-    #     )
-        
-    #     log_transform = widgets.Checkbox(
-    #         value=False,
-    #         description='Transformation log'
-    #     )
-        
-    #     update_button = widgets.Button(
-    #         description='Comparer',
-    #         button_style='primary',
-    #         icon='exchange'
-    #     )
-        
-    #     output = widgets.Output()
-        
-    #     # Fonction de mise à jour
-    #     def update_comparison(b):
-    #         with output:
-    #             clear_output(wait=True)
-                
-    #             author1 = author1_search.value
-    #             author2 = author2_search.value
-    #             is_career = dataset_type.value == 'Career'
-    #             year = year_selector.value
-    #             exclude = exclude_self.value
-    #             log_tf = log_transform.value
-                
-    #             if not author1 or not author2:
-    #                 print("Veuillez entrer les deux noms d'auteurs")
-    #                 return
-                
-    #             print(f"Comparaison de {author1} et {author2}...")
-                
-    #             try:
-    #                 fig = self.plot_author_comparison(
-    #                     author1, author2, year, is_career, exclude, log_tf
-    #                 )
-    #                 fig.show()
-                    
-    #                 # Afficher les infos pour les deux auteurs
-    #                 index = "career" if is_career else "singleyr"
-    #                 info1 = self.get_author_info(author1, index)
-    #                 info2 = self.get_author_info(author2, index)
-                    
-    #                 if info1 and info2:
-    #                     print(f"\n{author1.split(',')[0]}:")
-    #                     print(f"  Rang: {info1['rank']} | H-index: {info1['h_index']} | Citations: {info1['total_citations']}")
-                        
-    #                     print(f"\n{author2.split(',')[0]}:")
-    #                     print(f"  Rang: {info2['rank']} | H-index: {info2['h_index']} | Citations: {info2['total_citations']}")
-                
-    #             except Exception as e:
-    #                 print(f"❌ Erreur: {str(e)}")
-        
-    #     update_button.on_click(update_comparison)
-        
-    #     # Layout
-    #     controls = widgets.VBox([
-    #         widgets.HBox([author1_search, author2_search]),
-    #         widgets.HBox([dataset_type, year_selector, update_button]),
-    #         widgets.HBox([exclude_self, log_transform])
-    #     ])
-        
-    #     display(controls, output)
-        
-    #     # Affichage initial
-    #     update_comparison(None)

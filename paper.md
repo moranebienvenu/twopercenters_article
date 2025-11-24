@@ -72,7 +72,7 @@ Author-vs-author comparison between researchers showing composite scores and cit
 :::{note} To activate Figure 5 interactivity: **<span style="color:red">click the play button `▶️`</span>** if available. If only the `⏻` icon is present, click it first to start the runtime, then click `▶️`.
 :::
 
-:::{figure} #fig5cell
+<!-- :::{figure} #fig5cell
 :label: fig5
 :name: author_vs_group_layout
 :placeholder: ./static/fig5.png
@@ -93,4 +93,4 @@ Author-vs-group analysis displaying individual performance against field average
 Group-vs-group comparison between research fields and countries with statistical distributions.
 ***Users can ... ***
 
-:::
+::: -->
