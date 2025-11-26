@@ -338,7 +338,7 @@ class TwoPercentersClient:
     
     #metrics for one author by career and year
     def author_vs_career_plot(self, author_name: str, exclude_self_citations: bool = False, 
-                          width: int = 1400, height: int = 2000):
+                          width: int = 900, height: int = 1500):
         """Crée le graphique de comparaison Career vs Single Year."""
         
         # Récupérer les données en utilisant self.get_author_data()
@@ -415,8 +415,8 @@ class TwoPercentersClient:
             rows=len(available_metrics), 
             cols=2,
             subplot_titles=subplot_titles,
-            vertical_spacing=0.02,
-            horizontal_spacing=0.05,
+            vertical_spacing=0.035,
+            horizontal_spacing=0.09,
             #column_titles=[f"<b>Career: {author_name}</b>", f"<b>Single Year: {author_name}</b>"]
         )
         
@@ -473,9 +473,9 @@ class TwoPercentersClient:
 
         # Ajouter tes deux annotations
         annotations += [
-            dict(text=f"<b>Career-long data: {author_name}</b>", x=0.10, y=1.05,
+            dict(text=f"<b>Career-long data: {author_name}</b>", x=0, y=1.05,
                 xref="paper", yref="paper", showarrow=False, font=dict(size=16)),
-            dict(text=f"<b>Single-year data: {author_name}</b>", x=0.90, y=1.05,
+            dict(text=f"<b>Single-year data: {author_name}</b>", x=1, y=1.05,
                 xref="paper", yref="paper", showarrow=False, font=dict(size=16))
         ]
 
@@ -1920,10 +1920,10 @@ class TwoPercentersClient:
                             {'type': 'box'}, {'type': 'box'}, {'type': 'box'}
                         ]
                     ],
-                    row_heights=[0.6, 0.6],
-                    horizontal_spacing=0.02,
-                    vertical_spacing=0.2,
-                    column_widths=[0.16, 0.16, 0.16, 0.16, 0.16, 0.16],
+                    row_heights=[0.45, 0.45],
+                    horizontal_spacing=0.03,
+                    vertical_spacing=0.10,
+                    column_widths=[0.16]*6,
                     #subplot_titles=[""] * 12
                 )
 
@@ -1986,7 +1986,19 @@ class TwoPercentersClient:
                 # Nombre d'auteurs dans le groupe (1,3)
                 try:
                     # Le count est stocké dans le 5ème élément (index 4) du score C
-                    group_size = group_stats.get('c', [0,0,0,0,0])[4] if 'c' in group_stats else 0
+                    # group_size = self.get_group_author_count(
+                    #     group_type=group_type_val,
+                    #     group_name=group_name,
+                    #     career=career_author,
+                    #     year=year_val if not career_author else None
+                    # )
+                    #group_stats.get('c', [0,0,0,0,0])[4] if 'c' in group_stats else 0
+                    # if key in group_data:
+                    #     group_stats = group_data[key]
+                        
+                    #     # Nombre d'auteurs = longueur d'une des listes de métriques
+                    #     group_size = len(group_stats.get('nc', [])) 
+                    group_size = result.get("count", 0)
                 except:
                     group_size = 0
                 
@@ -2054,7 +2066,7 @@ class TwoPercentersClient:
                 # ==================================================================
                 
                 fig.update_layout(
-                    height=900,
+                    height=650,
                     plot_bgcolor=self.bgc,
                     paper_bgcolor=self.bgc,
                     font={'color': self.lightAccent1},
@@ -2068,15 +2080,20 @@ class TwoPercentersClient:
                 )
                 
                 # Axes
-                for row in range(1, 4):
-                    for col in range(1, 5):
-                        if row == 1 and col == 4:
-                            continue
-                        if row == 3 and col > 2:
-                            continue
-                        
-                        fig.update_xaxes(showticklabels=False, showgrid=False, row=row, col=col)
-                        fig.update_yaxes(showgrid=True, gridcolor=self.darkAccent2, row=row, col=col)
+                boxplot_positions = [
+                    (1,1),  # Composite score
+                    (2,1), (2,2), (2,3), (2,4), (2,5), (2,6)  # 6 metrics
+                ]
+
+                for (row, col) in boxplot_positions:
+                    fig.update_xaxes(showticklabels=False, showgrid=False, row=row, col=col)
+                    fig.update_yaxes(showgrid=True, gridcolor=self.darkAccent2, row=row, col=col)
+                # for row in range(1, 2):
+                #     for col in range(1, 6):
+
+                #         fig.update_xaxes(showticklabels=False, showgrid=False, row=row, col=col)
+                #         fig.update_yaxes(showgrid=True, gridcolor=self.darkAccent2, row=row, col=col)
+                 
                 
                 # Initialiser la liste des annotations
                 annotations = []
@@ -2117,7 +2134,7 @@ class TwoPercentersClient:
                 # Titres pour les sous-graphiques
                 
                 annotations.append(dict(
-                    x=0.08, y=1,
+                    x=0.08, y=1.05,
                     xref='paper', yref='paper',
                     text='<b>Composite Score (C)</b>',
                     showarrow=False,
@@ -2127,7 +2144,7 @@ class TwoPercentersClient:
                 
                 # Titres des 6 métriques
                 metric_positions = [
-                    (0.08, 0.60), (0.24, 0.60), (0.40, 0.60), (0.56, 0.60), (0.72, 0.60), (0.88, 0.60) 
+                    (0.05, 0.52), (0.21, 0.52), (0.39, 0.52), (0.56, 0.52), (0.75, 0.52), (0.92, 0.52) 
                 ]
                 
                 for i, (x, y) in enumerate(metric_positions):
@@ -2166,7 +2183,7 @@ class TwoPercentersClient:
                     print("❌ Please select both an author and a group")
                     return
                 
-                print(f"🔄 Generating comparison for {author_name} vs {group_name}...")
+                #print(f" Generating comparison for {author_name} vs {group_name}...")
                 
                 try:
                     fig = create_comparison_figures_author_group(
