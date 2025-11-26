@@ -152,104 +152,687 @@ class TwoPercentersClient:
             'sm-subfield-1 count':'total number of authors within category sm-subfield-1'}
         return metric_name_dict.get(metric, metric)
     
-
-    #utils coming from twopercenters dashboard 
-    def get_aggregate_data(self, group, group_name, prefix):
+    def get_es_results(self, search_term, idx_name, search_fields, exact=False, debug=False):
         """
-        Récupère les données agrégées pour un groupe donné (pays, domaine, institution)
-        Basé sur la fonction get_es_aggregate du serveur
+        Recherche dans l'API des agrégats (pays, champs, institutions) côté client.
         """
         try:
-            if group == 'cntry':
-                # Convertir le nom du pays en code ISO3 comme dans le serveur
-                cur_country = coco.convert(names=group_name, to='ISO3')
-                results = self.get_es_results(cur_country.lower(), f'{prefix}_cntry', 'cntry', True)
-            elif group == "sm-field":
-                results = self.get_es_results(group_name, f'{prefix}_field', 'sm-field')
-            elif group == "inst_name":
-                results = self.get_es_results(group_name, f'{prefix}_inst', 'inst_name')
+            # Définir l'URL de l'API selon le type de recherche
+            url_map = {
+                'career_cntry': 'aggregate/country',
+                'singleyr_cntry': 'aggregate/country',
+                'career_field': 'aggregate/field',
+                'singleyr_field': 'aggregate/field',
+                'career_inst': 'aggregate/institution',
+                'singleyr_inst': 'aggregate/institution'
+            }
+            
+            # Extraire le type d'agrégat de idx_name
+            if 'country' in idx_name or 'cntry' in idx_name:
+                api_type = 'country'
+            elif 'field' in idx_name:
+                api_type = 'field'
+            elif 'inst' in idx_name:
+                api_type = 'institution'
             else:
-                return None
+                api_type = idx_name
                 
-            if results is not None:
-                data = self.es_result_pick(results, 'data', None)
-                return data
-            else:
-                return None
-                
-        except Exception as e:
-            print(f"Erreur dans get_aggregate_data: {e}")
-            return None
+            url = f"{self.base_url}/aggregate/{api_type}"
 
-    def get_es_results(self, search_term, idx_name, search_fields, exact=False):
-        """
-        Recherche dans ElasticSearch - version adaptée pour le client
-        """
-        try:
+            # Paramètres de la requête
+            params = {'limit': 500}
+            
             if exact:
-                result = self.es.search(
-                    index=idx_name,
-                    size=100,
-                    body={
-                        "query": {
-                            "term": {
-                                search_fields: search_term
-                            },
-                        }
-                    })
+                params[search_fields] = search_term  # recherche exacte
             else:
-                result = self.es.search(
-                    index=idx_name,
-                    size=100, 
-                    body={
-                        "query": {
-                            "multi_match": {
-                                "query": search_term, 
-                                "operator": "and",
-                                "fuzziness": "auto",
-                                "fields": [search_fields]
-                            },
-                        }
-                    })
-                    
-            if 'hits' in result and 'hits' in result['hits'] and result['hits']['hits']:
-                return pd.json_normalize(result['hits']['hits'])
+                params['query'] = search_term       # recherche floue / générale
+
+            # Appel HTTP GET à l'API
+            response = self.session.get(url, params=params)
+            response.raise_for_status()
+
+            data = response.json()
+            results = data.get('results', [])
+
+            if debug and results:
+                print(f"DEBUG - Premier résultat:")
+                print(f"  Clés: {results[0].keys()}")
+                if 'data' in results[0]:
+                    data_sample = str(results[0]['data'])[:100]
+                    print(f"  Type de 'data': {type(results[0]['data'])}")
+                    print(f"  Début de 'data': {data_sample}...")
+
+            if results:
+                return pd.json_normalize(results)
             else:
                 return None
-                
+
         except Exception as e:
             print(f"Erreur ES: {e}")
             return None
 
-    def es_result_pick(self, result, field, nohit=['']):
-        """
-        Extrait les données des résultats ES - version client
-        """
-        if result is not None:
-            if field == 'data':
-                return self.base64_decode_and_decompress(result[f'_source.{field}'])
-            elif (f'_source.{field}' in result.keys()):
-                return list(result[f'_source.{field}'])
-            else:
-                return nohit
-        else:
-            return nohit
 
-    def base64_decode_and_decompress(self, encoded_data, flg=True):
+    # def get_aggregate_data(self, group, group_name, prefix):
+    #     """
+    #     Récupère les données agrégées pour un groupe donné (pays, domaine, institution)
+    #     Basé sur la fonction get_es_aggregate du serveur
+    #     """
+    #     try:
+    #         # Appeler get_es_results avec les bons paramètres
+    #         if group == 'cntry':
+    #             cur_country = coco.convert(names=group_name, to='ISO3')
+    #             results = self.get_es_results(cur_country.lower(), f'{prefix}_cntry', 'cntry', exact=True)
+    #         elif group == "sm-field":
+    #             results = self.get_es_results(group_name, f'{prefix}_field', 'sm-field', exact=False)
+    #         elif group == "inst_name":
+    #             results = self.get_es_results(group_name, f'{prefix}_inst', 'inst_name', exact=False)
+    #         else:
+    #             return None
+
+    #         if results is not None and not results.empty:
+    #             # Le premier résultat contient les données
+    #             first_result = results.iloc[0]
+                
+    #             # Vérifier si 'data' existe dans les colonnes
+    #             if 'data' in results.columns:
+    #                 data_field = first_result['data']
+                    
+    #                 # Les données sont en base64 compressé (string)
+    #                 if isinstance(data_field, str) and len(data_field) > 10:
+    #                     try:
+    #                         decompressed_data = self.base64_decode_and_decompress(data_field, flg=False)
+    #                         return decompressed_data
+    #                     except Exception as e:
+    #                         print(f"Erreur décompression pour {group_name}: {e}")
+    #                         return None
+    #                 elif isinstance(data_field, dict):
+    #                     # Si c'est déjà un dictionnaire, le retourner directement
+    #                     return data_field
+    #                 else:
+    #                     print(f"Type de données inattendu pour {group_name}: {type(data_field)}, longueur: {len(str(data_field))}")
+    #                     return None
+    #             else:
+    #                 print(f"Colonne 'data' non trouvée. Colonnes disponibles: {results.columns.tolist()}")
+    #                 return None
+    #         else:
+    #             print(f"Aucun résultat trouvé pour {group_name}")
+    #             return None
+
+    #     except Exception as e:
+    #         print(f"Erreur dans get_aggregate_data pour {group_name}: {e}")
+    #         import traceback
+    #         traceback.print_exc()
+    #         return None
+
+    def get_aggregate_data(self, group, group_name, prefix):
+        """
+        Récupère les données agrégées pour un groupe donné (pays, domaine, institution)
+        Retourne un tuple (data, count) où count est le nombre d'auteurs
+        """
+        try:
+            # Déterminer le type d'agrégation pour l'API
+            if group == 'cntry':
+                api_type = 'country'
+                # Convertir le nom du pays en code ISO3 comme le fait le serveur
+                try:
+                    search_term = coco.convert(names=group_name, to='ISO3').lower()
+                except:
+                    search_term = group_name.lower()
+            elif group == "sm-field":
+                api_type = 'field'
+                search_term = group_name
+            elif group == "inst_name":
+                api_type = 'institution'
+                search_term = group_name
+            else:
+                return None, 0
+
+            # Appeler l'API d'agrégation
+            url = f"{self.base_url}/aggregate/{api_type}"
+            params = {'limit': 500}  # Augmenter la limite pour trouver le groupe spécifique
+            
+            response = self.session.get(url, params=params)
+            response.raise_for_status()
+            
+            data = response.json()
+            results = data.get('results', [])
+            
+            # Trouver le groupe spécifique
+            group_data = None
+            for result in results:
+                if group == 'cntry' and result.get('cntry', '').lower() == search_term:
+                    group_data = result
+                    break
+                elif group == 'sm-field' and result.get('sm-field') == search_term:
+                    group_data = result
+                    break
+                elif group == 'inst_name' and result.get('inst_name') == search_term:
+                    group_data = result
+                    break
+            
+            if not group_data:
+                print(f"❌ Groupe '{group_name}' non trouvé dans les résultats")
+                return None, 0
+            
+            # Extraire les données et le count
+            data_field = group_data.get('data')
+            count = group_data.get('count', 0)
+            
+            # Décompresser les données si nécessaire
+            if isinstance(data_field, str) and len(data_field) > 10:
+                try:
+                    decompressed_data = self.base64_decode_and_decompress(data_field, flg=False)
+                    return decompressed_data, count
+                except Exception as e:
+                    print(f"Erreur décompression pour {group_name}: {e}")
+                    return None, count
+            elif isinstance(data_field, dict):
+                # Si c'est déjà un dictionnaire, le retourner directement
+                return data_field, count
+            else:
+                print(f"Type de données inattendu pour {group_name}: {type(data_field)}")
+                return None, count
+                
+        except Exception as e:
+            print(f"Erreur dans get_aggregate_data pour {group_name}: {e}")
+            import traceback
+            traceback.print_exc()
+            return None, 0
+    
+    def base64_decode_and_decompress(self, encoded_data, flg=False):
         """
         Décode les données compressées - version client
+        IMPORTANT: flg=True seulement si les données sont dans une pandas Series
+        Par défaut flg=False car on reçoit directement des strings de l'API
         """
+        try:
+            # Si flg=True, on suppose que c'est une pandas Series (comportement legacy)
+            # Si flg=False (défaut), c'est déjà une string
+            if flg:
+                if hasattr(encoded_data, '__getitem__') and not isinstance(encoded_data, str):
+                    encoded_data = encoded_data[0]
+            
+            # Vérifier que nous avons bien une string non vide
+            if not isinstance(encoded_data, str):
+                raise ValueError(f"encoded_data doit être une string, reçu: {type(encoded_data)}")
+            
+            if len(encoded_data) < 4:
+                raise ValueError(f"encoded_data trop court: {len(encoded_data)} caractères")
+            
+            # Base64 decode the data
+            compressed_data = base64.b64decode(encoded_data)
+            
+            # Decompress the data using zlib
+            decompressed_data = zlib.decompress(compressed_data)
+            
+            # Convert the decompressed string back to a dictionary
+            decoded_data = json.loads(decompressed_data.decode('utf-8'))
+            
+            return decoded_data
+            
+        except Exception as e:
+            print(f"Erreur lors de la décompression: {e}")
+            print(f"  Type de données reçu: {type(encoded_data)}")
+            if isinstance(encoded_data, str):
+                print(f"  Longueur: {len(encoded_data)}")
+                print(f"  Début: {encoded_data[:50] if len(encoded_data) > 50 else encoded_data}")
+            return None
+    
+    def get_group_author_count(self, group_type: str, group_name: str, 
+                              career: bool = True, year: str = None) -> int:
+        """
+        Récupère le nombre total d'auteurs dans un groupe.
+        
+        Args:
+            group_type: Type de groupe ('cntry', 'sm-field', 'inst_name')
+            group_name: Nom du groupe
+            career: Si True, données carrière, sinon année unique
+            year: Année spécifique si career=False
+        
+        Returns:
+            Nombre total d'auteurs dans le groupe
+        """
+        try:
+            # Construire l'URL selon le type de groupe
+            if group_type == 'cntry':
+                api_type = 'country'
+                country_code = coco.convert(names=group_name, to='ISO2')
+                search_value = country_code.lower()
+                search_param = 'cntry'
+            elif group_type == 'sm-field':
+                api_type = 'field'
+                search_value = group_name
+                search_param = 'sm-field'
+            else:  # inst_name
+                api_type = 'institution'
+                search_value = group_name
+                search_param = 'inst_name'
+            
+            url = f"{self.base_url}/aggregate/{api_type}"
+            
+            # Paramètres de requête
+            params = {search_param: search_value, 'limit': 1}
+            if not career and year:
+                params['year'] = year
+            
+            # Appel API
+            response = self.session.get(url, params=params)
+            response.raise_for_status()
+            
+            data = response.json()
+            results = data.get('results', [])
+            
+            if results:
+                # Le count devrait être dans le premier résultat
+                result = results[0]
+                return result.get('count', 0)
+            
+            return 0
+            
+        except Exception as e:
+            print(f"Erreur get_group_author_count: {e}")
+            return 0
+        """
+        Décode les données compressées - version client
+        IMPORTANT: flg=True seulement si les données sont dans une pandas Series
+        Par défaut flg=False car on reçoit directement des strings de l'API
+        """
+        try:
+            # Si flg=True, on suppose que c'est une pandas Series (comportement legacy)
+            # Si flg=False (défaut), c'est déjà une string
+            if flg:
+                if hasattr(encoded_data, '__getitem__') and not isinstance(encoded_data, str):
+                    encoded_data = encoded_data[0]
+            
+            # Vérifier que nous avons bien une string non vide
+            if not isinstance(encoded_data, str):
+                raise ValueError(f"encoded_data doit être une string, reçu: {type(encoded_data)}")
+            
+            if len(encoded_data) < 4:
+                raise ValueError(f"encoded_data trop court: {len(encoded_data)} caractères")
+            
+            # Base64 decode the data
+            compressed_data = base64.b64decode(encoded_data)
+            
+            # Decompress the data using zlib
+            decompressed_data = zlib.decompress(compressed_data)
+            
+            # Convert the decompressed string back to a dictionary
+            decoded_data = json.loads(decompressed_data.decode('utf-8'))
+            
+            return decoded_data
+            
+        except Exception as e:
+            print(f"Erreur lors de la décompression: {e}")
+            print(f"  Type de données reçu: {type(encoded_data)}")
+            if isinstance(encoded_data, str):
+                print(f"  Longueur: {len(encoded_data)}")
+                print(f"  Début: {encoded_data[:50] if len(encoded_data) > 50 else encoded_data}")
+            return None
+    
+    def get_es_aggregate_client(self, group, group_name, prefix):
+        """
+        Version client de get_es_aggregate qui calcule les agrégations
+        en récupérant tous les auteurs du groupe via l'API
+        """
+        try:
+            # Déterminer l'index et le champ de recherche
+            if group == 'cntry':
+                index = f'{prefix}_cntry' if hasattr(self, 'use_aggregate_indices') else 'career'
+                search_field = 'cntry'
+                # Convertir le nom du pays en code
+                try:
+                    search_term = coco.convert(names=group_name, to='ISO3').lower()
+                except:
+                    search_term = group_name.lower()
+                    
+            elif group == 'sm-field':
+                index = f'{prefix}_field' if hasattr(self, 'use_aggregate_indices') else 'career'
+                search_field = 'sm-field'
+                search_term = group_name
+                
+            elif group == 'inst_name':
+                index = f'{prefix}_inst' if hasattr(self, 'use_aggregate_indices') else 'career'
+                search_field = 'inst_name'
+                search_term = group_name
+            else:
+                return None
 
-        # Base64 decode the data
-        compressed_data = base64.b64decode(encoded_data)
+            # Récupérer TOUS les auteurs de ce groupe
+            url = f"{self.base_url}/search/authors"
+            payload = {
+                "query": search_term,
+                "index": "career",  # Utiliser career pour avoir toutes les données
+                "field": search_field,
+                "limit": 10000,  # Limite élevée pour obtenir tous les auteurs
+                "exact_match": True
+            }
+            
+            response = self.session.post(url, json=payload)
+            response.raise_for_status()
+            
+            data = response.json()
+            results = data.get('results', [])
+            
+            if not results:
+                return None
+
+            # Préparer les données agrégées comme le fait le serveur
+            aggregate_data = {}
+            metrics = ['nc', 'h', 'hm', 'ncs', 'ncsf', 'ncsfl', 'c', 'self%']
+            
+            for metric in metrics:
+                values = []
+                for result in results:
+                    author_data = result.get('Author_Data')
+                    if author_data and isinstance(author_data, str):
+                        # Décompresser les données d'auteur
+                        try:
+                            decompressed = self.base64_decode_and_decompress(author_data, flg=False)
+                            if decompressed and f'{prefix}_0' in decompressed:
+                                metric_value = decompressed[f'{prefix}_0'].get(metric)
+                                if metric_value is not None:
+                                    values.append(metric_value)
+                        except:
+                            continue
+                
+                if values:
+                    # Calculer les statistiques: [min, Q1, median, Q3, max, count]
+                    sorted_vals = sorted(values)
+                    n = len(sorted_vals)
+                    aggregate_data[metric] = [
+                        sorted_vals[0],  # min
+                        sorted_vals[n//4] if n > 1 else sorted_vals[0],  # Q1
+                        sorted_vals[n//2] if n > 1 else sorted_vals[0],  # median
+                        sorted_vals[3*n//4] if n > 3 else sorted_vals[-1],  # Q3
+                        sorted_vals[-1],  # max
+                        n  # count - C'EST ICI QU'ON OBTIENT LE NOMBRE D'AUTEURS!
+                    ]
+            
+            # Structurer comme le serveur
+            structured_data = {
+                f'{prefix}_0': aggregate_data,
+                f'{prefix}_0_log': aggregate_data  # Pour simplifier, même données
+            }
+            
+            return structured_data
+            
+        except Exception as e:
+            print(f"Erreur dans get_es_aggregate_client: {e}")
+            return None
+    # def get_es_results(self, search_term, idx_name, search_fields, exact=False, debug=False):
+    #     """
+    #     Recherche dans l'API des agrégats (pays, champs, institutions) côté client.
+    #     """
+    #     try:
+    #         # Définir l'URL de l'API selon le type de recherche
+    #         url_map = {
+    #             'career_cntry': 'aggregate/country',
+    #             'singleyr_cntry': 'aggregate/country',
+    #             'career_field': 'aggregate/field',
+    #             'singleyr_field': 'aggregate/field',
+    #             'career_inst': 'aggregate/institution',
+    #             'singleyr_inst': 'aggregate/institution'
+    #         }
+            
+    #         # Extraire le type d'agrégat de idx_name
+    #         if 'country' in idx_name or 'cntry' in idx_name:
+    #             api_type = 'country'
+    #         elif 'field' in idx_name:
+    #             api_type = 'field'
+    #         elif 'inst' in idx_name:
+    #             api_type = 'institution'
+    #         else:
+    #             api_type = idx_name
+                
+    #         url = f"{self.base_url}/aggregate/{api_type}"
+
+    #         # Paramètres de la requête
+    #         params = {'limit': 500}
+            
+    #         if exact:
+    #             params[search_fields] = search_term  # recherche exacte
+    #         else:
+    #             params['query'] = search_term       # recherche floue / générale
+
+    #         # Appel HTTP GET à l'API
+    #         response = self.session.get(url, params=params)
+    #         response.raise_for_status()
+
+    #         data = response.json()
+    #         results = data.get('results', [])
+
+    #         if debug and results:
+    #             print(f"DEBUG - Premier résultat:")
+    #             print(f"  Clés: {results[0].keys()}")
+    #             if 'data' in results[0]:
+    #                 data_sample = str(results[0]['data'])[:100]
+    #                 print(f"  Type de 'data': {type(results[0]['data'])}")
+    #                 print(f"  Début de 'data': {data_sample}...")
+
+    #         if results:
+    #             return pd.json_normalize(results)
+    #         else:
+    #             return None
+
+    #     except Exception as e:
+    #         print(f"Erreur ES: {e}")
+    #         return None
+
+
+    # def get_aggregate_data(self, group, group_name, prefix):
+    #     """
+    #     Récupère les données agrégées pour un groupe donné (pays, domaine, institution)
+    #     Basé sur la fonction get_es_aggregate du serveur
+    #     """
+    #     try:
+    #         if group == 'cntry':
+    #             cur_country = coco.convert(names=group_name, to='ISO3')
+    #             results = self.get_es_results(cur_country.lower(), f'{prefix}_cntry', 'cntry', True)
+    #         elif group == "sm-field":
+    #             results = self.get_es_results(group_name, f'{prefix}_field', 'sm-field')
+    #         elif group == "inst_name":
+    #             results = self.get_es_results(group_name, f'{prefix}_inst', 'inst_name')
+    #         else:
+    #             return None
+
+    #         if results is not None and not results.empty:
+    #             # Le premier résultat contient les données
+    #             first_result = results.iloc[0]
+                
+    #             # Vérifier si 'data' existe dans les colonnes
+    #             if 'data' in results.columns:
+    #                 data_field = first_result['data']
+                    
+    #                 # Vérifier le type de données
+    #                 if isinstance(data_field, str):
+    #                     # Si c'est une chaîne, essayer de la décompresser
+    #                     try:
+    #                         decompressed_data = self.base64_decode_and_decompress(data_field, flg=False)
+    #                         return decompressed_data
+    #                     except:
+    #                         # Si la décompression échoue, essayer de parser comme JSON
+    #                         try:
+    #                             return json.loads(data_field)
+    #                         except:
+    #                             print(f"Impossible de parser les données")
+    #                             return None
+    #                 elif isinstance(data_field, dict):
+    #                     # Si c'est déjà un dictionnaire, le retourner directement
+    #                     return data_field
+    #                 else:
+    #                     print(f"Type de données inattendu: {type(data_field)}")
+    #                     return None
+    #             else:
+    #                 print(f"Colonne 'data' non trouvée. Colonnes disponibles: {results.columns.tolist()}")
+    #                 return None
+    #         else:
+    #             print(f"Aucun résultat trouvé pour {group_name}")
+    #             return None
+
+    #     except Exception as e:
+    #         print(f"Erreur dans get_aggregate_data: {e}")
+    #         import traceback
+    #         traceback.print_exc()
+    #         return None
+
+
+    # def base64_decode_and_decompress(self, encoded_data, flg=True):
+    #     """
+    #     Décode les données compressées - version client
+    #     IMPORTANT: flg=False car les données ne sont pas dans une pandas Series
+    #     """
+    #     try:
+    #         # Si flg=True, on suppose que c'est une pandas Series (comportement original)
+    #         # Si flg=False, c'est déjà une string
+    #         if flg and hasattr(encoded_data, '__getitem__'):
+    #             encoded_data = encoded_data[0]
+            
+    #         # Base64 decode the data
+    #         compressed_data = base64.b64decode(encoded_data)
+            
+    #         # Decompress the data using zlib
+    #         decompressed_data = zlib.decompress(compressed_data)
+            
+    #         # Convert the decompressed string back to a dictionary
+    #         decoded_data = json.loads(decompressed_data.decode('utf-8'))
+            
+    #         return decoded_data
+    #     except Exception as e:
+    #         print(f"Erreur lors de la décompression: {e}")
+    #         return None
+
+    #first attempts 
+    #utils coming from twopercenters dashboard 
+    # def get_aggregate_data(self, group, group_name, prefix):
+    #     """
+    #     Récupère les données agrégées pour un groupe donné (pays, domaine, institution)
+    #     Basé sur la fonction get_es_aggregate du serveur
+    #     """
+    #     try:
+    #         if group == 'cntry':
+    #             cur_country = coco.convert(names=group_name, to='ISO3')
+    #             results = self.get_es_results(cur_country.lower(), f'{prefix}_cntry', 'cntry', True)
+    #         elif group == "sm-field":
+    #             results = self.get_es_results(group_name, f'{prefix}_field', 'sm-field')
+    #         elif group == "inst_name":
+    #             results = self.get_es_results(group_name, f'{prefix}_inst', 'inst_name')
+    #         else:
+    #             return None
+
+    #         if results is not None:
+    #             # Ici, on prend juste la colonne 'data' si elle existe
+    #             if 'data' in results.columns:
+    #                 return results['data'].iloc[0]
+    #             else:
+    #                 return results.to_dict(orient='records')[0]  # fallback
+    #         else:
+    #             return None
+
+    #     except Exception as e:
+    #         print(f"Erreur dans get_aggregate_data: {e}")
+    #         return None
+        # try:
+        #     if exact:
+        #         result = self.es.search(
+        #             index=idx_name,
+        #             size=100,
+        #             body={
+        #                 "query": {
+        #                     "term": {
+        #                         search_fields: search_term
+        #                     },
+        #                 }
+        #             })
+        #     else:
+        #         result = self.es.search(
+        #             index=idx_name,
+        #             size=100, 
+        #             body={
+        #                 "query": {
+        #                     "multi_match": {
+        #                         "query": search_term, 
+        #                         "operator": "and",
+        #                         "fuzziness": "auto",
+        #                         "fields": [search_fields]
+        #                     },
+        #                 }
+        #             })
+                    
+        #     if 'hits' in result and 'hits' in result['hits'] and result['hits']['hits']:
+        #         return pd.json_normalize(result['hits']['hits'])
+        #     else:
+        #         return None
+                
+        # except Exception as e:
+        #     print(f"Erreur ES: {e}")
+        #     return None
+
+    # def es_result_pick(self, result, field, nohit=['']):
+    #     """
+    #     Extrait les données des résultats ES - version client
+    #     """
+    #     if result is not None:
+    #         if field == 'data':
+    #             return self.base64_decode_and_decompress(result[f'_source.{field}'])
+    #         elif (f'_source.{field}' in result.keys()):
+    #             return list(result[f'_source.{field}'])
+    #         else:
+    #             return nohit
+    #     else:
+    # #         return nohit
+
+    # def get_es_results(self, search_term, idx_name, search_fields, exact=False):
+    #     """
+    #     Recherche dans l'API des agrégats (pays, champs, institutions) côté client.
+    #     """
+    #     try:
+    #         # Définir l'URL de l'API selon le type de recherche
+    #         url_map = {
+    #             'cntry': 'aggregate/country',
+    #             'sm-field': 'aggregate/field',
+    #             'inst_name': 'aggregate/institution'
+    #         }
+    #         url = f"{self.base_url}/{url_map.get(idx_name, idx_name)}"
+
+    #         # Paramètres de la requête
+    #         params = {'limit': 100}  # limiter le nombre de résultats
+    #         if exact:
+    #             params[search_fields] = search_term  # recherche exacte
+    #         else:
+    #             params['query'] = search_term       # recherche floue / générale
+
+    #         # Appel HTTP GET à l'API
+    #         response = self.session.get(url, params=params)
+    #         response.raise_for_status()
+
+    #         data = response.json()           # récupérer le JSON
+    #         results = data.get('results', [])  # prendre les résultats
+
+    #         if results:
+    #             return pd.json_normalize(results)  # renvoyer un DataFrame pandas
+    #         else:
+    #             return None
+
+    #     except Exception as e:
+    #         print(f"Erreur ES: {e}")
+    #         return None
+    
+    # def base64_decode_and_decompress(self, encoded_data, flg=True):
+    #     """
+    #     Décode les données compressées - version client
+    #     """
+
+    #     # Base64 decode the data
+    #     compressed_data = base64.b64decode(encoded_data)
         
-        # Decompress the data using zlib
-        decompressed_data = zlib.decompress(compressed_data)
+    #     # Decompress the data using zlib
+    #     decompressed_data = zlib.decompress(compressed_data)
         
-        # Convert the decompressed string back to a dictionary
-        decoded_data = json.loads(decompressed_data.decode('utf-8'))
+    #     # Convert the decompressed string back to a dictionary
+    #     decoded_data = json.loads(decompressed_data.decode('utf-8'))
         
-        return decoded_data
+    #     return decoded_data
 
     # ========================================================================
     # MÉTHODES D'INTERROGATION API
@@ -1827,69 +2410,83 @@ class TwoPercentersClient:
                 author_data = self.get_author_data(author_name, prefix)
                 
                 if not author_data:
+                    print(f"❌ no data found for {author_name}")
                     return None
                     
+            
                 key = f"{prefix}_{year_val}"
                 if key not in author_data:
+                    print(f"❌ year {year_val} not available for this author")
                     return None
                     
                 author_metrics = author_data[key]
                 
-                # Récupérer les données du groupe via API aggregate
-                if group_type_val == 'cntry':
-                    # Convertir le nom du pays en code ISO2
-                    try:
-                        country_code = coco.convert(names=group_name, to='ISO2')
-                        group_value = country_code.lower()
-                    except:
-                        country_code = group_name
-                        group_value = group_name.lower()
+                # # Récupérer les données du groupe via API aggregate
+                # if group_type_val == 'cntry':
+                #     # Convertir le nom du pays en code ISO2
+                #     try:
+                #         country_code = coco.convert(names=group_name, to='ISO2')
+                #         group_value = country_code.lower()
+                #     except:
+                #         country_code = group_name
+                #         group_value = group_name.lower()
                         
-                    url = f"{self.base_url}/aggregate/country"
-                elif group_type_val == 'sm-field':
-                    group_value = group_name
-                    url = f"{self.base_url}/aggregate/field"
-                else:  # inst_name
-                    group_value = group_name
-                    url = f"{self.base_url}/aggregate/institution"
+                #     url = f"{self.base_url}/aggregate/country"
+                # elif group_type_val == 'sm-field':
+                #     group_value = group_name
+                #     url = f"{self.base_url}/aggregate/field"
+                # else:  # inst_name
+                #     group_value = group_name
+                #     url = f"{self.base_url}/aggregate/institution"
                 
-                params = {'limit': 500}
-                if not career_author:
-                    params['year'] = year_val
+                # params = {'limit': 500}
+                # if not career_author:
+                #     params['year'] = year_val
                 
-                response = self.session.get(url, params=params)
-                response.raise_for_status()
+                # response = self.session.get(url, params=params)
+                # response.raise_for_status()
                 
-                data = response.json()
-                results = data.get('results', [])
+                # data = response.json()
+                # results = data.get('results', [])
                 
                 # Trouver le groupe spécifique
-                group_data = None
-                for result in results:
-                    if group_type_val == 'cntry' and result.get('cntry', '').lower() == group_value:
-                        group_data = result.get('data')
-                        break
-                    elif group_type_val == 'sm-field' and result.get('sm-field') == group_value:
-                        group_data = result.get('data')
-                        break
-                    elif group_type_val == 'inst_name' and result.get('inst_name') == group_value:
-                        group_data = result.get('data')
-                        break
-                
-                if not group_data:
-                    print(f"❌ Groupe '{group_name}' non trouvé")
-                    return None
-                
-                # Décompresser si nécessaire
-                if isinstance(group_data, str):
-                    group_data = self.base64_decode_and_decompress(group_data)
-                
-                if key not in group_data:
+                # group_data = None
+                group_data, count = self.get_aggregate_data(group_type_val, group_name, prefix)
+
+                if group_data is None or key not in group_data:
                     print(f"❌ Données non disponibles pour {year_val}")
                     return None
-                
+
                 group_stats = group_data[key]
+
+                # for result in results:
+                #     if group_type_val == 'cntry' and result.get('cntry', '').lower() == group_value:
+                #         group_data = result.get('data')
+                #         break
+                #     elif group_type_val == 'sm-field' and result.get('sm-field') == group_value:
+                #         group_data = result.get('data')
+                #         break
+                #     elif group_type_val == 'inst_name' and result.get('inst_name') == group_value:
+                #         group_data = result.get('data')
+                #         break
                 
+                # if not group_data:
+                #     print(f"❌ Groupe '{group_name}' non trouvé")
+                #     return None
+                
+                # # Décompresser si nécessaire
+                # if isinstance(group_data, str):
+                #     group_data = self.base64_decode_and_decompress(group_data)
+                
+                # if key not in group_data:
+                #     print(f"❌ Données non disponibles pour {year_val}")
+                #     return None
+                
+                # group_stats = group_data[key]
+                try:
+                    n2 = group_stats['c'][5]  # Le count est à l'index 5
+                except:
+                    n2 = 0
                 # Définir les métriques
                 suffix = ' (ns)' if exclude_self_val else ''
                 metrics_base = ['nc', 'h', 'hm', 'ncs', 'ncsf', 'ncsfl', 'c']
@@ -1921,8 +2518,8 @@ class TwoPercentersClient:
                         ]
                     ],
                     row_heights=[0.45, 0.45],
-                    horizontal_spacing=0.03,
-                    vertical_spacing=0.10,
+                    horizontal_spacing=0.05,
+                    vertical_spacing=0.15,
                     column_widths=[0.16]*6,
                     #subplot_titles=[""] * 12
                 )
@@ -1984,7 +2581,7 @@ class TwoPercentersClient:
                 )
                 
                 # Nombre d'auteurs dans le groupe (1,3)
-                try:
+                #try:
                     # Le count est stocké dans le 5ème élément (index 4) du score C
                     # group_size = self.get_group_author_count(
                     #     group_type=group_type_val,
@@ -1998,14 +2595,17 @@ class TwoPercentersClient:
                         
                     #     # Nombre d'auteurs = longueur d'une des listes de métriques
                     #     group_size = len(group_stats.get('nc', [])) 
-                    group_size = result.get("count", 0)
-                except:
-                    group_size = 0
+                    #group_size = result.get("count", 0)
+                    #group_size = group_count #len(group_stats.get('c', [])) if 'c' in group_stats else 0
+                #     n2 = group_stats['c'][5]
+                # except:
+                #     n2=0
+                    #group_size = 0
                 
                 fig.add_trace(
                     go.Indicator(
                         mode="number",
-                        value=group_size,
+                        value=n2, #group_size,
                         number={'font': {'color': self.highlight2, 'size': 60}},
                         title={
                             'text': f"<b>Authors in<br>{group_name[:20]}...</b>" if len(group_name) > 20 else f"<b>Authors in<br>{group_name}</b>",
@@ -2066,7 +2666,7 @@ class TwoPercentersClient:
                 # ==================================================================
                 
                 fig.update_layout(
-                    height=650,
+                    height=500,
                     plot_bgcolor=self.bgc,
                     paper_bgcolor=self.bgc,
                     font={'color': self.lightAccent1},
@@ -2224,8 +2824,592 @@ class TwoPercentersClient:
 
 
     #group_vs_group_layout
-    def interactive_group_vs_group_comparison(self):
-        return 
+    # def interactive_group_vs_group_comparison(self):
+    #     """Interface interactive pour comparer un auteur à un groupe."""
+        
+    #     # ==========================================================================================
+    #     # WIDGETS DE CONTRÔLE - AUTEUR
+    #     # ==========================================================================================
+        
+    #     group_type_1 = widgets.Dropdown(
+    #         options=[
+    #             ('Country', 'cntry'),
+    #             ('Field', 'sm-field'), 
+    #             ('Institution', 'inst_name')
+    #         ],
+    #         value='sm-field',
+    #         description='Group1:',
+    #         style={'description_width': '100px'},
+    #         layout=widgets.Layout(width='200px')
+    #     )
+        
+    #     group_selection_1 = widgets.Combobox(
+    #         value='Clinical Medicine',
+    #         placeholder='Select group...',
+    #         options=[],
+    #         description='Select1:',
+    #         ensure_option=False,
+    #         style={'description_width': '100px'},
+    #         layout=widgets.Layout(width='400px')
+    #     )
+        
+    #     group_status_1 = widgets.HTML(value='')
+        
+    #     # ==========================================================================================
+    #     # WIDGETS DE CONTRÔLE - GROUPE 2
+    #     # ==========================================================================================
+        
+    #     group_type_2 = widgets.Dropdown(
+    #         options=[
+    #             ('Country', 'cntry'),
+    #             ('Field', 'sm-field'), 
+    #             ('Institution', 'inst_name')
+    #         ],
+    #         value='sm-field',
+    #         description='Group2:',
+    #         style={'description_width': '100px'},
+    #         layout=widgets.Layout(width='200px')
+    #     )
+        
+    #     group_selection_2 = widgets.Combobox(
+    #         value='Clinical Medicine',
+    #         placeholder='Select group...',
+    #         options=[],
+    #         description='Select2:',
+    #         ensure_option=False,
+    #         style={'description_width': '100px'},
+    #         layout=widgets.Layout(width='400px')
+    #     )
+        
+    #     group_status_2 = widgets.HTML(value='')
+        
+    #     # ==========================================================================================
+    #     # OPTIONS GLOBALES
+    #     # ==========================================================================================
+        
+    #     career_single_group = widgets.Dropdown(
+    #         options=['Career', 'Single Year'],
+    #         value='Career',
+    #         description='Dataset:',
+    #         style={'description_width': '100px'}
+    #     )
+        
+    #     year_group = widgets.Dropdown(
+    #         options=['2017', '2018', '2019', '2020', '2021'],
+    #         value='2021',
+    #         description='Year:',
+    #         style={'description_width': '60px'},
+    #         layout=widgets.Layout(width='150px')
+    #     )
+        
+    #     exclude_self = widgets.Checkbox(
+    #         value=False,
+    #         description='Exclude self-citations',
+    #         style={'description_width': '150px'}
+    #     )
+        
+    #     log_transform = widgets.Checkbox(
+    #         value=False,
+    #         description='Log transformed',
+    #         style={'description_width': '150px'}
+    #     )
+        
+    #     update_button = widgets.Button(
+    #         description='Generate Comparison',
+    #         button_style='success',
+    #         icon='refresh',
+    #         layout=widgets.Layout(width='250px')
+    #     )
+        
+    #     output = widgets.Output()
+        
+    #     # ==========================================================================================
+    #     # FONCTIONS DE MISE À JOUR
+    #     # ==========================================================================================
+        
+    #     def update_author_suggestions(change):
+    #         query = change['new']
+    #         if len(query) >= 3:
+    #             search_status.value = '<i>Researching...</i>'
+    #             try:
+    #                 results = self.search_authors(query, limit=20)
+    #                 suggestions = [r.get('authfull', '') for r in results if r.get('authfull')]
+    #                 author_search.options = suggestions
+    #                 search_status.value = f'<i>✓ {len(suggestions)} results found</i>'
+    #             except Exception as e:
+    #                 search_status.value = f'<i style="color:red">Error: {str(e)}</i>'
+    #         else:
+    #             author_search.options = []
+    #             search_status.value = '<i>Write at least 3 characters...</i>'
+        
+    #     def update_group_options(change):
+    #         """Met à jour les options de groupe disponibles."""
+    #         try:
+    #             career = career_single_author.value == 'Career'
+    #             year = year_author.value
+    #             group = group_type.value
+                
+    #             # Déterminer le type d'API à appeler
+    #             if group == 'cntry':
+    #                 api_type = 'country'
+    #             elif group == 'sm-field':
+    #                 api_type = 'field'
+    #             else:  # inst_name
+    #                 api_type = 'institution'
+                
+    #             # Appeler l'API aggregate
+    #             url = f"{self.base_url}/aggregate/{api_type}"
+    #             params = {'limit': 500}
+                
+    #             if not career:
+    #                 params['year'] = year
+                
+    #             response = self.session.get(url, params=params)
+    #             response.raise_for_status()
+                
+    #             data = response.json()
+    #             results = data.get('results', [])
+                
+    #             # Extraire les options
+    #             options = []
+    #             for result in results:
+    #                 if group == 'cntry':
+    #                     code = result.get('cntry', '').lower()
+    #                     if code and code not in ['csk', 'nan']:
+    #                         try:
+    #                             name = coco.convert(code, to='name_short')
+    #                             if name:
+    #                                 options.append(name)
+    #                         except:
+    #                             pass
+    #                 elif group == 'sm-field':
+    #                     field = result.get('sm-field', '')
+    #                     if field and field != 'Nan':
+    #                         options.append(field)
+    #                 else:  # inst_name
+    #                     inst = result.get('inst_name', '')
+    #                     if inst and inst != 'Nan':
+    #                         options.append(inst)
+                
+    #             group_selection.options = sorted(set(options))
+    #             group_status.value = f'<i>✓ {len(options)} groups available</i>'
+                
+    #         except Exception as e:
+    #             group_status.value = f'<i style="color:red">Error: {str(e)}</i>'
+        
+    #     author_search.observe(update_author_suggestions, names='value')
+    #     group_type.observe(update_group_options, names='value')
+    #     career_single_author.observe(update_group_options, names='value')
+    #     year_author.observe(update_group_options, names='value')
+        
+    #     # ==========================================================================================
+    #     # FONCTION PRINCIPALE
+    #     # ==========================================================================================
+        
+    #     def create_comparison_figures_author_group(author_name, career_author, year_val, group_type_val, 
+    #                                 group_name, exclude_self_val, log_transform_val):
+    #         """Crée les figures de comparaison auteur vs groupe."""
+            
+    #         try:
+    #             # Récupérer les données de l'auteur
+    #             prefix = 'career' if career_author else 'singleyr'
+    #             author_data = self.get_author_data(author_name, prefix)
+                
+    #             if not author_data:
+    #                 return None
+                    
+    #             key = f"{prefix}_{year_val}"
+    #             if key not in author_data:
+    #                 return None
+                    
+    #             author_metrics = author_data[key]
+                
+    #             # Récupérer les données du groupe via API aggregate
+    #             if group_type_val == 'cntry':
+    #                 # Convertir le nom du pays en code ISO2
+    #                 try:
+    #                     country_code = coco.convert(names=group_name, to='ISO2')
+    #                     group_value = country_code.lower()
+    #                 except:
+    #                     country_code = group_name
+    #                     group_value = group_name.lower()
+                        
+    #                 url = f"{self.base_url}/aggregate/country"
+    #             elif group_type_val == 'sm-field':
+    #                 group_value = group_name
+    #                 url = f"{self.base_url}/aggregate/field"
+    #             else:  # inst_name
+    #                 group_value = group_name
+    #                 url = f"{self.base_url}/aggregate/institution"
+                
+    #             params = {'limit': 500}
+    #             if not career_author:
+    #                 params['year'] = year_val
+                
+    #             response = self.session.get(url, params=params)
+    #             response.raise_for_status()
+                
+    #             data = response.json()
+    #             results = data.get('results', [])
+                
+    #             # Trouver le groupe spécifique
+    #             group_data = None
+    #             for result in results:
+    #                 if group_type_val == 'cntry' and result.get('cntry', '').lower() == group_value:
+    #                     group_data = result.get('data')
+    #                     break
+    #                 elif group_type_val == 'sm-field' and result.get('sm-field') == group_value:
+    #                     group_data = result.get('data')
+    #                     break
+    #                 elif group_type_val == 'inst_name' and result.get('inst_name') == group_value:
+    #                     group_data = result.get('data')
+    #                     break
+                
+    #             if not group_data:
+    #                 print(f"❌ Groupe '{group_name}' non trouvé")
+    #                 return None
+                
+    #             # Décompresser si nécessaire
+    #             if isinstance(group_data, str):
+    #                 group_data = self.base64_decode_and_decompress(group_data)
+                
+    #             if key not in group_data:
+    #                 print(f"❌ Données non disponibles pour {year_val}")
+    #                 return None
+                
+    #             group_stats = group_data[key]
+                
+    #             # Définir les métriques
+    #             suffix = ' (ns)' if exclude_self_val else ''
+    #             metrics_base = ['nc', 'h', 'hm', 'ncs', 'ncsf', 'ncsfl', 'c']
+    #             metrics_with_suffix = [f'{m}{suffix}' for m in metrics_base]
+                
+    #             metric_titles = [
+    #                 'Number of citations<br>(NC)', 
+    #                 'H-index<br>(H)', 
+    #                 'Hm-index<br>(Hm)', 
+    #                 'Number of citations to<br>single authored papers<br>(NCS)', 
+    #                 'Number of citations to<br>single and first<br>authored papers<br>(NCSF)', 
+    #                 'Number of citations to<br>single, first and<br>last authored papers<br>(NCSFL)', 
+    #                 'Composite score (C)'
+    #             ]
+                
+              
+    #             fig = make_subplots(
+    #                 rows=2,
+    #                 cols=6,
+    #                 specs=[
+    #                     [
+    #                         {'type': 'box'}, None,
+    #                         {'type': 'indicator'}, None,
+    #                         {'type': 'indicator'}, None
+    #                     ],
+    #                     [
+    #                         {'type': 'box'}, {'type': 'box'}, {'type': 'box'},
+    #                         {'type': 'box'}, {'type': 'box'}, {'type': 'box'}
+    #                     ]
+    #                 ],
+    #                 row_heights=[0.45, 0.45],
+    #                 horizontal_spacing=0.05,
+    #                 vertical_spacing=0.15,
+    #                 column_widths=[0.16]*6,
+    #                 #subplot_titles=[""] * 12
+    #             )
+
+                
+    #             # ==================================================================
+    #             # LIGNE 1: Score C (1,1) + Rank (1,2) + Number of authors (1,3)
+    #             # ==================================================================
+                
+    #             # Score C - Box plot du groupe
+    #             c_metric = metrics_base[6]
+    #             c_value_author = author_metrics.get(metrics_with_suffix[6], 0)
+                
+    #             if c_metric in group_stats:
+    #                 c_stats = group_stats[c_metric]
+    #                 if isinstance(c_stats, list) and len(c_stats) >= 5:
+    #                     fig.add_trace(
+    #                         go.Box(
+    #                             q1=[c_stats[1]],
+    #                             median=[c_stats[2]],
+    #                             q3=[c_stats[3]],
+    #                             lowerfence=[c_stats[0]],
+    #                             upperfence=[c_stats[4]],
+    #                             name=group_name,
+    #                             marker_color=self.highlight2,
+    #                             boxpoints=False,
+    #                             showlegend=False
+    #                         ),
+    #                         row=1, col=1
+    #                     )
+                
+    #             # Ligne pour l'auteur (comme scatter pour éviter l'erreur avec Indicator)
+    #             fig.add_trace(
+    #                 go.Scatter(
+    #                     x=[0, 1],
+    #                     y=[c_value_author, c_value_author],
+    #                     mode='lines',
+    #                     line=dict(color=self.highlight1, width=4),
+    #                     name=f'Author: {c_value_author:.1f}',
+    #                     showlegend=False,
+    #                     hovertemplate=f'Author: {c_value_author:.1f}<extra></extra>'
+    #                 ),
+    #                 row=1, col=1
+    #             )
+                
+    #             # Rank de l'auteur (1,2)
+    #             rank = author_metrics.get(f'rank{suffix}', 'N/A')
+    #             fig.add_trace(
+    #                 go.Indicator(
+    #                     mode="number",
+    #                     value=rank if isinstance(rank, (int, float)) else 0,
+    #                     number={'font': {'color': self.highlight1, 'size': 60}},
+    #                     title={
+    #                         'text': f"<b>Rank of<br>{author_name.split(',')[0]}</b>",
+    #                         'font': {'color': self.highlight1, 'size': 12}
+    #                     }
+    #                 ),
+    #                 row=1, col=3
+    #             )
+                
+    #             # Nombre d'auteurs dans le groupe (1,3)
+    #             try:
+    #                 # Le count est stocké dans le 5ème élément (index 4) du score C
+    #                 # group_size = self.get_group_author_count(
+    #                 #     group_type=group_type_val,
+    #                 #     group_name=group_name,
+    #                 #     career=career_author,
+    #                 #     year=year_val if not career_author else None
+    #                 # )
+    #                 #group_stats.get('c', [0,0,0,0,0])[4] if 'c' in group_stats else 0
+    #                 # if key in group_data:
+    #                 #     group_stats = group_data[key]
+                        
+    #                 #     # Nombre d'auteurs = longueur d'une des listes de métriques
+    #                 #     group_size = len(group_stats.get('nc', [])) 
+    #                 group_size = result.get("count", 0)
+    #             except:
+    #                 group_size = 0
+                
+    #             fig.add_trace(
+    #                 go.Indicator(
+    #                     mode="number",
+    #                     value=group_size,
+    #                     number={'font': {'color': self.highlight2, 'size': 60}},
+    #                     title={
+    #                         'text': f"<b>Authors in<br>{group_name[:20]}...</b>" if len(group_name) > 20 else f"<b>Authors in<br>{group_name}</b>",
+    #                         'font': {'color': self.highlight2, 'size': 12}
+    #                     }
+    #                 ),
+    #                 row=1, col=5
+    #             )
+                
+    #             # ==================================================================
+    #             # LIGNES 2 et 3: Les 6 métriques
+    #             # ==================================================================
+                
+    #             positions = [(2,1), (2,2), (2,3), (2,4), (2,5), (2,6)]
+                
+    #             for i in range(6):
+    #                 base_metric = metrics_base[i]
+    #                 metric_with_suffix = metrics_with_suffix[i]
+    #                 author_value = author_metrics.get(metric_with_suffix, 0)
+                    
+    #                 row, col = positions[i]
+                    
+    #                 # Box plot du groupe
+    #                 if base_metric in group_stats:
+    #                     stats = group_stats[base_metric]
+    #                     if isinstance(stats, list) and len(stats) >= 5:
+    #                         fig.add_trace(
+    #                             go.Box(
+    #                                 q1=[stats[1]],
+    #                                 median=[stats[2]],
+    #                                 q3=[stats[3]],
+    #                                 lowerfence=[stats[0]],
+    #                                 upperfence=[stats[4]],
+    #                                 name=group_name,
+    #                                 marker_color=self.highlight2,
+    #                                 boxpoints=False,
+    #                                 showlegend=False
+    #                             ),
+    #                             row=row, col=col
+    #                         )
+                    
+    #                 # Ligne pour l'auteur (comme scatter)
+    #                 fig.add_trace(
+    #                     go.Scatter(
+    #                         x=[0, 1],
+    #                         y=[author_value, author_value],
+    #                         mode='lines',
+    #                         line=dict(color=self.highlight1, width=3),
+    #                         name=f'Author: {author_value:.1f}',
+    #                         showlegend=False,
+    #                         hovertemplate=f'Author: {author_value:.1f}<extra></extra>'
+    #                     ),
+    #                     row=row, col=col
+    #                 )
+                
+    #             # ==================================================================
+    #             # MISE EN FORME
+    #             # ==================================================================
+                
+    #             fig.update_layout(
+    #                 height=500,
+    #                 plot_bgcolor=self.bgc,
+    #                 paper_bgcolor=self.bgc,
+    #                 font={'color': self.lightAccent1},
+    #                 showlegend=False,
+    #                 title={
+    #                     'text': f"Comparison: {author_name} vs {group_name}",
+    #                     'font': {'size': 20, 'color': self.lightAccent1},
+    #                     'x': 0.5
+    #                 },
+    #                 #margin={'l': 40, 'r': 40, 't': 100, 'b': 40}
+    #             )
+                
+    #             # Axes
+    #             boxplot_positions = [
+    #                 (1,1),  # Composite score
+    #                 (2,1), (2,2), (2,3), (2,4), (2,5), (2,6)  # 6 metrics
+    #             ]
+
+    #             for (row, col) in boxplot_positions:
+    #                 fig.update_xaxes(showticklabels=False, showgrid=False, row=row, col=col)
+    #                 fig.update_yaxes(showgrid=True, gridcolor=self.darkAccent2, row=row, col=col)
+    #             # for row in range(1, 2):
+    #             #     for col in range(1, 6):
+
+    #             #         fig.update_xaxes(showticklabels=False, showgrid=False, row=row, col=col)
+    #             #         fig.update_yaxes(showgrid=True, gridcolor=self.darkAccent2, row=row, col=col)
+                 
+                
+    #             # Initialiser la liste des annotations
+    #             annotations = []
+                
+    #             # Ajouter des annotations pour montrer les valeurs de l'auteur
+    #             # Annotation pour le Score C
+    #             annotations.append(dict(
+    #                 x=0.5, y=c_value_author,
+    #                 xref='x', yref='y',
+    #                 text=f'Author: {c_value_author:.1f}',
+    #                 showarrow=True,
+    #                 arrowhead=2,
+    #                 arrowcolor=self.highlight1,
+    #                 ax=-40, ay=-30,
+    #                 font=dict(size=10, color=self.highlight1),
+    #                 xanchor='left'
+    #             ))
+                
+    #             # Annotations pour les 6 métriques
+    #             x_positions = [0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+    #             y_values = [author_metrics.get(metrics_with_suffix[i], 0) for i in range(6)]
+    #             x_refs = ['x2', 'x3', 'x4', 'x5', 'x6', 'x7']
+    #             y_refs = ['y2', 'y3', 'y4', 'y5', 'y6', 'y7']
+                
+    #             for i in range(6):
+    #                 annotations.append(dict(
+    #                     x=x_positions[i], y=y_values[i],
+    #                     xref=x_refs[i], yref=y_refs[i],
+    #                     text=f'{y_values[i]:.0f}',
+    #                     showarrow=True,
+    #                     arrowhead=2,
+    #                     arrowcolor=self.highlight1,
+    #                     ax=-30, ay=-20,
+    #                     font=dict(size=9, color=self.highlight1),
+    #                     xanchor='left'
+    #                 ))
+                
+    #             # Titres pour les sous-graphiques
+                
+    #             annotations.append(dict(
+    #                 x=0.08, y=1.05,
+    #                 xref='paper', yref='paper',
+    #                 text='<b>Composite Score (C)</b>',
+    #                 showarrow=False,
+    #                 font=dict(size=12, color=self.lightAccent1),
+    #                 xanchor='center'
+    #             ))
+                
+    #             # Titres des 6 métriques
+    #             metric_positions = [
+    #                 (0.05, 0.52), (0.21, 0.52), (0.39, 0.52), (0.56, 0.52), (0.75, 0.52), (0.92, 0.52) 
+    #             ]
+                
+    #             for i, (x, y) in enumerate(metric_positions):
+    #                 annotations.append(dict(
+    #                     x=x, y=y,
+    #                     xref='paper', yref='paper',
+    #                     text=f'<b>{metric_titles[i]}</b>',
+    #                     showarrow=False,
+    #                     font=dict(size=11, color=self.lightAccent1),
+    #                     xanchor='center'
+    #                 ))
+                
+    #             fig.update_layout(annotations=annotations)
+                
+    #             return fig
+                
+    #         except Exception as e:
+    #             print(f"❌ Error creating comparison: {e}")
+    #             import traceback
+    #             traceback.print_exc()
+    #             return None
+        
+    #     def update_comparison(b=None):
+    #         with output:
+    #             clear_output(wait=True)
+                
+    #             author_name = author_search.value
+    #             career_author = career_single_author.value == 'Career'
+    #             year_val = year_author.value
+    #             group_type_val = group_type.value
+    #             group_name = group_selection.value
+    #             exclude_self_val = exclude_self.value
+    #             log_tf = log_transform.value
+                
+    #             if not author_name or not group_name:
+    #                 print("❌ Please select both an author and a group")
+    #                 return
+                
+    #             #print(f" Generating comparison for {author_name} vs {group_name}...")
+                
+    #             try:
+    #                 fig = create_comparison_figures_author_group(
+    #                     author_name, career_author, year_val, group_type_val,
+    #                     group_name, exclude_self_val, log_tf
+    #                 )
+                    
+    #                 if fig:
+    #                     fig.show()
+    #                 else:
+    #                     print("❌ No data available")
+                        
+    #             except Exception as e:
+    #                 print(f"❌ Error: {str(e)}")
+    #                 import traceback
+    #                 traceback.print_exc()
+        
+    #     update_button.on_click(update_comparison)
+        
+    #     # ==========================================================================================
+    #     # LAYOUT FINAL
+    #     # ==========================================================================================
+        
+    #     controls = widgets.VBox([
+    #         widgets.HBox([author_search, search_status, career_single_author, year_author]),
+    #         widgets.HBox([group_type, group_selection, group_status]),
+    #         widgets.HBox([exclude_self, log_transform, update_button])
+    #     ])
+        
+    #     display(controls)
+    #     display(output)
+        
+    #     # Initialiser les options de groupe
+    #     update_group_options(None)
+        
+    #     # Chargement initial
+    #     update_comparison()
     
     # ========================================================================
     # VISUALISATION - MAPS
