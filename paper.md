@@ -126,7 +126,7 @@ All source code, configuration files, and deployment scripts were made freely av
 
 **<span style="color:red">To enable interactivity, attach a runtime by clicking the `⏻` icon in the top-right corner of the figure 1 panel</span>**. If no runtime is attached, the figure will remain in its default state: hover and basic interactions are available.
 
-**<span style="color:red">Once loaded, three buttons appear in the corner. Click the middle play button `▶️` to activate figure 1.</span>** When the static figure is replaced by an interactive Plotly chart, use the toggles to modify the display. Use `↩` to revert to the original static figure.
+**<span style="color:red">Once loaded, three buttons appear in the corner. Click the middle play button `▶️` to activate figure 1.</span>** When the static figure is replaced by an interactive Plotly chart, use the toggles to modify the display. Use <span style="display:inline-block; transform: scaleX(-1) scaleY(-1);">↪️</span> to revert to the original static figure.
 
 :::
 
@@ -189,7 +189,7 @@ Temporal trends comparing career-long versus single-year performance trajectorie
 :name: author_vs_author_layout
 :placeholder: ./static/fig4.png
 
-Author-vs-author comparison between researchers showing composite scores and citation distributions. 
+Author-vs-author comparison between researchers showing composite scores and citation distributions. Abbreviations: Number of Citations (NC), H-index (H), Hm-index (Hm), Number of citations to single-authored papers (NCS), Number of citations to single and first-authored papers (NCSF), Number of citations to single, first, and last-authored papers (NCSFL). 
 ***Users can enter another authors' names (a minimum of three letters is required), and a list of available authors will be shown. Users can also select the type of analysis (Career or Single Year), choose the year (2017–2021), and toggle the exclusion of self-citations or Log transformation.***
 :::
 
@@ -201,7 +201,7 @@ Author-vs-author comparison between researchers showing composite scores and cit
 :name: author_vs_group_layout
 :placeholder: ./static/fig5.png
 
-Author-vs-group analysis displaying individual performance against field averages (41,350 authors in Clinical Medicine).
+Author-vs-group analysis displaying individual performance against field averages (41,350 authors in Clinical Medicine).Abbreviations: Number of Citations (NC), H-index (H), Hm-index (Hm), Number of citations to single-authored papers (NCS), Number of citations to single and first-authored papers (NCSF), Number of citations to single, first, and last-authored papers (NCSFL). 
 ***Users can enter another author’s name (minimum of three letters) to see a list of available authors. They can also select the type of analysis (Career or Single Year) and choose the year (2017–2021) for the single author. For the group comparator, users can select the organisation (by country, field, or institute), and a list of available options will be shown. Additionally, users can toggle the exclusion of self-citations or apply a log transformation. ***
 
 :::
@@ -214,12 +214,12 @@ Author-vs-group analysis displaying individual performance against field average
 :name: group_vs_group_layout
 :placeholder: ./static/fig6.png
 
-Group-vs-group comparison between research fields and countries with statistical distributions.
+Group-vs-group comparison between research fields and countries with statistical distributions. Abbreviations: Number of Citations (NC), H-index (H), Hm-index (Hm), Number of citations to single-authored papers (NCS), Number of citations to single and first-authored papers (NCSF), Number of citations to single, first, and last-authored papers (NCSFL). 
 ***For each group, users can select the organisation (by country, field, institute or All), and a list of available options will be shown. They can also select the type of analysis (Career or Single Year), choose the year (2017–2021),toggle the exclusion of self-citations or apply a log transformation.***
 
 :::
 
-[](#fig4),[](#fig5) and [](#fig6) demonstrate comparison options across multiple organizational levels, from individual researchers to entire research fields and national systems. The panels allow users to toggle between career-span and single-year metrics while maintaining the option to exclude self-citations for more objective assessments. Statistical visualizations include box plots and distribution analyses that reveal performance variability within groups, providing context for individual achievements relative to peer cohorts. This multi-scale approach supports evidence-based evaluation of research impact across institutional, national, and disciplinary boundaries
+[](#fig4), [](#fig5) and [](#fig6) demonstrate comparison options across multiple organizational levels, from individual researchers to entire research fields and national systems. The panels allow users to toggle between career-span and single-year metrics while maintaining the option to exclude self-citations for more objective assessments. Statistical visualizations include box plots and distribution analyses that reveal performance variability within groups, providing context for individual achievements relative to peer cohorts. This multi-scale approach supports evidence-based evaluation of research impact across institutional, national, and disciplinary boundaries
 
 # Conclusion
 
