@@ -124,9 +124,9 @@ All source code, configuration files, and deployment scripts were made freely av
 
 :::{attention} Enable Computational Interactivity 
 
-**<span style="color:red">To enable interactivity, attach a runtime by clicking the `⏻` icon in the top-right corner of the figure 1 panel</span>**. If no runtime is attached, the figure will remain in its default state: hover and basic interactions are available.
+**<span style="color:red">To enable interactivity, attach a runtime by clicking the `⏻` icon in the top-right corner of the figure 2 panel</span>**. If no runtime is attached, the figure will remain in its default state: hover and basic interactions are available.
 
-**<span style="color:red">Once loaded, three buttons appear in the corner. Click the middle play button `▶️` to activate figure 1.</span>** When the static figure is replaced by an interactive Plotly chart, use the toggles to modify the display. Use <span style="display:inline-block; transform: scaleX(-1) scaleY(-1);">↪️</span> to revert to the original static figure.
+**<span style="color:red">Once loaded, three buttons appear in the corner. Click the middle play button `▶️` to activate figure 2.</span>** When the static figure is replaced by an interactive Plotly chart, use the toggles to modify the display. Use <span style="display:inline-block; transform: scaleX(-1) scaleY(-1);">↪️</span> to revert to the original static figure.
 
 :::
 
@@ -154,7 +154,7 @@ The default state of [](#fig1) displays median H-index values across countries, 
 
 ---
 
-:::{note} To activate Figure 2 interactivity: **<span style="color:red">click the play button `▶️`</span>** if available. If only the `⏻` icon is present, click it first to start the runtime, then click `▶️`.
+:::{note} To activate Figure 3 interactivity: **<span style="color:red">click the play button `▶️`</span>** if available. If only the `⏻` icon is present, click it first to start the runtime, then click `▶️`.
 :::
 
 :::{figure} #fig2cell
@@ -167,7 +167,7 @@ Individual researcher performance panel showing example bibliometric analysis fo
 
 :::
 
-:::{note} To activate Figure 3 interactivity: **<span style="color:red">click the play button `▶️`</span>** if available. If only the `⏻` icon is present, click it first to start the runtime, then click `▶️`.
+:::{note} To activate Figure 4 interactivity: **<span style="color:red">click the play button `▶️`</span>** if available. If only the `⏻` icon is present, click it first to start the runtime, then click `▶️`.
 :::
 
 :::{figure} #fig3cell
@@ -181,7 +181,7 @@ Temporal trends comparing career-long versus single-year performance trajectorie
 
 [](#fig2) and [](#fig3) present a multifaceted research impact assessment through both aggregate career metrics and year-specific performance indicators. A key feature includes the option to exclude self-citations, allowing users to examine how researcher rankings change when self-referential patterns are removed from the analysis. The temporal comparison between career-long and single-year data reveals how annual fluctuations in citation patterns contrast with the stability of cumulative metrics. This dual-perspective approach enables more objective evaluation of researcher trajectories, particularly valuable for understanding sustained versus ephemeral impact in scholarly productivity assessments.
 
-:::{note} To activate Figure 4 interactivity: **<span style="color:red">click the play button `▶️`</span>** if available. If only the `⏻` icon is present, click it first to start the runtime, then click `▶️`.
+:::{note} To activate Figure 5 interactivity: **<span style="color:red">click the play button `▶️`</span>** if available. If only the `⏻` icon is present, click it first to start the runtime, then click `▶️`.
 :::
 
 :::{figure} #fig4cell
@@ -193,7 +193,7 @@ Author-vs-author comparison between researchers showing composite scores and cit
 ***Users can enter another authors' names (a minimum of three letters is required), and a list of available authors will be shown. Users can also select the type of analysis (Career or Single Year), choose the year (2017–2021), and toggle the exclusion of self-citations or Log transformation.***
 :::
 
-:::{note} To activate Figure 5 interactivity: **<span style="color:red">click the play button `▶️`</span>** if available. If only the `⏻` icon is present, click it first to start the runtime, then click `▶️`.
+:::{note} To activate Figure 6 interactivity: **<span style="color:red">click the play button `▶️`</span>** if available. If only the `⏻` icon is present, click it first to start the runtime, then click `▶️`.
 :::
 
 :::{figure} #fig5cell
@@ -206,7 +206,7 @@ Author-vs-group analysis displaying individual performance against field average
 
 :::
 
-:::{note} To activate Figure 6 interactivity: **<span style="color:red">click the play button `▶️`</span>** if available. If only the `⏻` icon is present, click it first to start the runtime, then click `▶️`.
+:::{note} To activate Figure 7 interactivity: **<span style="color:red">click the play button `▶️`</span>** if available. If only the `⏻` icon is present, click it first to start the runtime, then click `▶️`.
 :::
 
 :::{figure} #fig6cell
