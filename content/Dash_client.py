@@ -3010,7 +3010,7 @@ class TwoPercentersClient:
         
         def update_map(b=None):
             with output:        
-                clear_output(wait=True)
+                #clear_output(wait=True)
                 career = dataset_type.value == 'Career'
                 year = year_selector.value
                 metric = metric_selector.value
