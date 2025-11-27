@@ -12,26 +12,32 @@ project:
     kernel:
       name: python3
   authors:
+    - name: Nadia Blostein
+      orcid: 0000-0002-1864-1899
+      affiliations: ucc
+      roles:
+        - Software
+        - Writing – original draft
     - name: Agah Karakuzu
       orcid: 0000-0001-7283-271X
       affiliations: polymtl; mhi
       corresponding: true
       email: agah.karakuzu@polymtl.ca
       twitter: agahkarakuzu
-      equal_contributor: true
       url: https://agah.dev
       github: agahkarakuzu
       roles:
-        - Conceptualization
         - Software
-        - Writing – original draft
-    - name: Robo Neuro
-      affiliations: polymtl
-      equal_contributor: true
-      github: roboneurolibre
-      note: Roboneuro is a friendly publishing bot who fails the Turing test.
+        - Writing – review & editing
+    - name: Nikola Stikov
+      orcid: 0000-0002-8480-5230
+      affiliations: polymtl; mhi; macedonia
       roles:
-        - Project administration
+        - Writing – review & editing
+    - name: John P.A. Ioannidis
+      orcid: 0000-0003-3118-6859
+      affiliations: stanfordmed
+      roles:
         - Writing – review & editing
   affiliations:
     - id: polymtl
@@ -54,13 +60,32 @@ project:
       region: Quebec
       country: Canada
       postal_code: H1T 1C8
+    - id: ucc
+      institution: University Collage Cork
+      ror: https://ror.org/03265fv13
+      isni: 0000 0001 2331 8773
+      address: College Rd, University College
+      city: Cork
+      country: Ireland
+    - id: macedonia
+      name: Center for Advanced Interdisciplinary Research, University Ss Cyril and Methodius in Skopje
+      ror: https://ror.org/02wk2vx54
+      isni: 0000 0001 0708 5391
+      address:  Boulevard Goce Delchev 9
+      city: Skopje
+      country: North Macedonia
+      postal_code: 1000
+    - id: stanfordmed
+      institution: Stanford University
+      department: Health Research and Policy
+      ror: https://ror.org/03mtd9a03
+      city: Palo Alto
+      region: California
   keywords:
-    - reproducible publishing
-    - mystmd
-    - next-gen preprints 
-    - interactive 
-    - neuroscience 
-  github: https://github.com/moranebienvenu/twopercenters_article #https://github.com/neurolibre/mystical-article 
+    - interactive dashboard
+    - metascience
+    - bibliometrics
+  github: https://github.com/moranebienvenu/twopercenters_article 
   banner: featured.jpg
   venue: Neurolibre #Production will override this.
   subject: Living Preprint # Production will override this.
