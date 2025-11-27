@@ -201,8 +201,7 @@ Author-vs-author comparison between researchers showing composite scores and cit
 :name: author_vs_group_layout
 :placeholder: ./static/fig5.png
 
-Author-vs-group analysis displaying individual performance against field averages (41,350 authors in Clinical Medicine).Abbreviations: Number of Citations (NC), H-index (H), Hm-index (Hm), Number of citations to single-authored papers (NCS), Number of citations to single and first-authored papers (NCSF), Number of citations to single, first, and last-authored papers (NCSFL). 
-***Users can enter another author’s name (minimum of three letters) to see a list of available authors. They can also select the type of analysis (Career or Single Year) and choose the year (2017–2021) for the single author. For the group comparator, users can select the organisation (by country, field, or institute), and a list of available options will be shown. Additionally, users can toggle the exclusion of self-citations or apply a log transformation. ***
+Author-vs-group analysis displaying individual performance against field averages (41,350 authors in Clinical Medicine).Abbreviations: Number of Citations (NC), H-index (H), Hm-index (Hm), Number of citations to single-authored papers (NCS), Number of citations to single and first-authored papers (NCSF), Number of citations to single, first, and last-authored papers (NCSFL). ***Users can enter another author’s name (minimum of three letters) to see a list of available authors. They can also select the type of analysis (Career or Single Year) and choose the year (2017–2021) for the single author. For the group comparator, users can select the organisation (by country, field, or institute), and a list of available options will be shown. Additionally, users can toggle the exclusion of self-citations or apply a log transformation.***
 
 :::
 
