@@ -2331,7 +2331,14 @@ class TwoPercentersClient:
                         code = result.get('cntry', '').lower()
                         if code and code not in ['csk', 'nan']:
                             try:
-                                name = coco.convert(code, to='name_short')
+                                if code == 'sux':
+                                    name = 'Russia'
+                                elif code == 'ant':
+                                    name = 'Netherlands'
+                                elif code == 'scg':
+                                    name = 'Czech Republic'
+                                else:
+                                    name = coco.convert(code, to='name_short')
                                 if name:
                                     options.append(name)
                             except:
@@ -2677,11 +2684,12 @@ class TwoPercentersClient:
         # ==========================================================================================
         # LAYOUT FINAL
         # ==========================================================================================
-        
+       
         controls = widgets.VBox([
             widgets.HBox([group_type_1, group_selection_1, group_status_1]),
             widgets.HBox([group_type_2, group_selection_2, group_status_2]),
-            widgets.HBox([career_single_group, year_group, exclude_self, log_transform, update_button])
+            widgets.HBox([career_single_group, year_group, exclude_self]),
+            widgets.HBox([log_transform, update_button])
         ])
         
         display(controls)
@@ -3017,7 +3025,7 @@ class TwoPercentersClient:
                 statistic = statistic_selector.value
                 exclude = exclude_self.value
                 
-                # print(f" Generating map for {metric} ({statistic}) - {year}...")
+                print(f"⏳ Generating map for the metric: {metric} (statistic: {statistic}) - year: {year}...")
                 
                 try:
                     fig = self.create_choropleth_map(
