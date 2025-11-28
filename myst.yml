@@ -18,7 +18,7 @@ project:
       roles:
         - Software
         - Writing – original draft
-    -name: Morane Bienvenu
+    - name: Morane Bienvenu
       affiliations: polymtl
       roles: 
         - Software
