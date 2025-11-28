@@ -18,6 +18,10 @@ project:
       roles:
         - Software
         - Writing – original draft
+    -name: Morane Bienvenu
+      affiliations: polymtl
+      roles: 
+        - Software
     - name: Agah Karakuzu
       orcid: 0000-0001-7283-271X
       affiliations: polymtl; mhi
