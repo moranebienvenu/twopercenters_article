@@ -15,6 +15,12 @@ date: 2025-11-24
 We built an interactive dashboard to explore citation data from the standardized citation indicators dataset covering 100,000 top-cited researchers across 22 disciplines. The system uses Elasticsearch for search and Plotly Dash for visualization, allowing users to compare researchers, institutions, countries, and fields through various bibliometric metrics. Users can toggle between career-long and single-year data, exclude self-citations, and examine temporal trends. The platform runs on open-source infrastructure and provides an alternative interface for bibliometric analysis. All source code and deployment instructions are fully open, so anyone can modify the platform for new datasets or expand its functionality.
 +++
 
+:::{iframe} https://twopercenters.db.neurolibre.org/
+:width: 100%
+:height: 600px
+:border: 0
+:::
+
 # Introduction
 
 To date, citations to scholarly articles have served as the primary currency for attributing credibility to their authors. From the academic job market to research funding decisions, citation counts and related metrics remain central indicators shaping outcomes. Google Scholar, a citation-based search engine, has become the dominant gateway to explore articles, author profiles and evaluative bibliography, largely because it is free and user-friendly [](https://doi.org/10.2139/ssrn.2921021).
