@@ -15,6 +15,7 @@ date: 2025-11-24
 We built an interactive dashboard to explore citation data from the standardized citation indicators dataset covering 100,000 top-cited researchers across 22 disciplines. The system uses Elasticsearch for search and Plotly Dash for visualization, allowing users to compare researchers, institutions, countries, and fields through various bibliometric metrics. Users can toggle between career-long and single-year data, exclude self-citations, and examine temporal trends. The platform runs on open-source infrastructure and provides an alternative interface for bibliometric analysis. All source code and deployment instructions are fully open, so anyone can modify the platform for new datasets or expand its functionality.
 +++
 
+## Dashboard
 :::{iframe} https://twopercenters.db.neurolibre.org/
 :width: 100%
 :border: 0
