@@ -17,7 +17,6 @@ We built an interactive dashboard to explore citation data from the standardized
 
 :::{iframe} https://twopercenters.db.neurolibre.org/
 :width: 100%
-:height: 600px
 :border: 0
 :::
 
