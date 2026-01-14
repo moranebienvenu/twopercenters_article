@@ -1,5 +1,0 @@
-requests 
-plotly 
-pandas 
-numpy 
-country-converter
