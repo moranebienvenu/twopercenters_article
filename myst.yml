@@ -6,7 +6,7 @@ project:
   thebe:
     enabled: true
     binder:
-      url: https://terrarium.evidencepub.io
+      url: https://mybinder.org  #https://terrarium.evidencepub.io
       repo: moranebienvenu/twopercenters_article
       ref: HEAD # Production will override this.
     kernel:
@@ -19,6 +19,7 @@ project:
         - Software
         - Writing – original draft
     - name: Morane Bienvenu
+      orcid: 0009-0005-7487-1567
       affiliations: polymtl
       roles: 
         - Software
